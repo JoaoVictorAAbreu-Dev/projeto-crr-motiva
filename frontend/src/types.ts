@@ -65,6 +65,18 @@ export interface CriticalSegmentReportItem {
   reasons: string;
 }
 
+export interface PriorityDistributionItem {
+  priorityLevel: PriorityLevel;
+  segmentCount: number;
+  interpretation: string;
+}
+
+export interface OperationalAlert {
+  title: string;
+  severity: string;
+  summary: string;
+}
+
 export interface EfficiencySummary {
   criticalSegments: number;
   highPrioritySegments: number;

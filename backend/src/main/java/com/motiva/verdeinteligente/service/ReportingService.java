@@ -4,6 +4,8 @@ import com.motiva.verdeinteligente.dto.CriticalSegmentReportItem;
 import com.motiva.verdeinteligente.dto.DashboardAssumptionsResponse;
 import com.motiva.verdeinteligente.dto.DashboardOverviewResponse;
 import com.motiva.verdeinteligente.dto.EfficiencySummaryResponse;
+import com.motiva.verdeinteligente.dto.OperationalAlertResponse;
+import com.motiva.verdeinteligente.dto.PriorityDistributionItemResponse;
 import com.motiva.verdeinteligente.model.PriorityAssessment;
 import com.motiva.verdeinteligente.model.PriorityLevel;
 import com.motiva.verdeinteligente.model.RoadSegment;
@@ -11,6 +13,7 @@ import com.motiva.verdeinteligente.repository.PriorityAssessmentRepository;
 import com.motiva.verdeinteligente.repository.RoadSegmentRepository;
 import com.motiva.verdeinteligente.repository.TeamRepository;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -114,6 +117,41 @@ public class ReportingService {
             List.of(
                 "Reference cycle range: 13 to 18 mowing cycles per year",
                 "Dynamic planning should improve crew, equipment, and logistics allocation"
+            )
+        );
+    }
+
+    public List<PriorityDistributionItemResponse> priorityDistribution() {
+        Map<PriorityLevel, Long> counts = priorityAssessmentRepository.findAllByOrderByScoreDesc().stream()
+            .collect(java.util.stream.Collectors.groupingBy(PriorityAssessment::getPriorityLevel, java.util.stream.Collectors.counting()));
+
+        return List.of(
+            new PriorityDistributionItemResponse(PriorityLevel.CRITICAL, counts.getOrDefault(PriorityLevel.CRITICAL, 0L).intValue(), "Immediate intervention backlog."),
+            new PriorityDistributionItemResponse(PriorityLevel.HIGH, counts.getOrDefault(PriorityLevel.HIGH, 0L).intValue(), "Should enter the weekly plan."),
+            new PriorityDistributionItemResponse(PriorityLevel.MEDIUM, counts.getOrDefault(PriorityLevel.MEDIUM, 0L).intValue(), "Keep under monitored scheduling."),
+            new PriorityDistributionItemResponse(PriorityLevel.LOW, counts.getOrDefault(PriorityLevel.LOW, 0L).intValue(), "No immediate field dispatch required.")
+        );
+    }
+
+    public List<OperationalAlertResponse> operationalAlerts() {
+        EfficiencySummaryResponse efficiency = efficiencySummary();
+        DashboardOverviewResponse overview = dashboardOverview();
+
+        return List.of(
+            new OperationalAlertResponse(
+                "Contract-sensitive backlog",
+                overview.segmentsAtContractRisk() > 3 ? "HIGH" : "MEDIUM",
+                overview.segmentsAtContractRisk() + " segments currently combine operational risk with contractual pressure."
+            ),
+            new OperationalAlertResponse(
+                "Crew utilization guidance",
+                overview.recommendedCrewUtilization() >= 80 ? "HIGH" : "MEDIUM",
+                "Suggested weekly crew utilization is " + overview.recommendedCrewUtilization() + "% under the current scenario."
+            ),
+            new OperationalAlertResponse(
+                "Cost optimization window",
+                efficiency.estimatedSavings() > 0 ? "OPPORTUNITY" : "INFO",
+                "Projected savings versus fixed scheduling: R$ " + Math.round(efficiency.estimatedSavings()) + "."
             )
         );
     }

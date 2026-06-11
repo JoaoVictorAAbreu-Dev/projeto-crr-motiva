@@ -2,6 +2,8 @@ package com.motiva.verdeinteligente.controller;
 
 import com.motiva.verdeinteligente.dto.CriticalSegmentReportItem;
 import com.motiva.verdeinteligente.dto.EfficiencySummaryResponse;
+import com.motiva.verdeinteligente.dto.OperationalAlertResponse;
+import com.motiva.verdeinteligente.dto.PriorityDistributionItemResponse;
 import com.motiva.verdeinteligente.service.ReportingService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,5 +28,15 @@ public class ReportsController {
     @GetMapping("/efficiency-summary")
     public EfficiencySummaryResponse efficiencySummary() {
         return reportingService.efficiencySummary();
+    }
+
+    @GetMapping("/priority-distribution")
+    public List<PriorityDistributionItemResponse> priorityDistribution() {
+        return reportingService.priorityDistribution();
+    }
+
+    @GetMapping("/operational-alerts")
+    public List<OperationalAlertResponse> operationalAlerts() {
+        return reportingService.operationalAlerts();
     }
 }

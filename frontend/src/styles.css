@@ -82,7 +82,9 @@ select {
 .stat-hint,
 .report-copy,
 .empty-state,
-.segment-notes {
+.segment-notes,
+.alert-card p,
+.distribution-card p {
   color: var(--muted);
 }
 
@@ -114,7 +116,9 @@ select {
 .report-grid,
 .filters-grid,
 .assumptions-grid,
-.assumptions-list-grid {
+.assumptions-list-grid,
+.distribution-list,
+.alerts-list {
   display: grid;
   gap: 18px;
 }
@@ -205,7 +209,8 @@ select {
 .plan-summary,
 .inspector-metrics,
 .scenario-actions,
-.focus-strip {
+.focus-strip,
+.map-summary-bar {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
@@ -214,7 +219,8 @@ select {
 .map-legend span,
 .plan-summary span,
 .inspector-metrics span,
-.focus-strip span {
+.focus-strip span,
+.map-summary-bar span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -308,6 +314,14 @@ select {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.distribution-list,
+.alerts-list,
+.report-grid,
+.assumptions-grid,
+.assumptions-list-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .scenario-grid label,
 .filters-grid label {
   display: grid;
@@ -380,6 +394,35 @@ select {
   font-family: "Space Grotesk", sans-serif;
 }
 
+.distribution-card,
+.alert-card,
+.report-grid article,
+.assumptions-grid article,
+.assumptions-list-grid > div {
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.alert-card span {
+  display: inline-flex;
+  margin-top: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.severity-high {
+  border: 1px solid rgba(255, 94, 77, 0.2);
+}
+
+.severity-medium,
+.severity-opportunity {
+  border: 1px solid rgba(255, 184, 77, 0.2);
+}
+
 .reason-list {
   margin: 0;
   padding-left: 18px;
@@ -390,21 +433,8 @@ select {
   margin-top: 6px;
 }
 
-.report-grid,
-.assumptions-grid,
-.assumptions-list-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.report-grid article,
-.assumptions-grid article,
-.assumptions-list-grid > div {
-  padding: 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.report-grid strong {
+.report-grid strong,
+.distribution-card strong {
   display: block;
   font-family: "Space Grotesk", sans-serif;
   font-size: 1.5rem;
@@ -418,7 +448,9 @@ select {
   .report-grid,
   .filters-grid,
   .assumptions-grid,
-  .assumptions-list-grid {
+  .assumptions-list-grid,
+  .distribution-list,
+  .alerts-list {
     grid-template-columns: 1fr;
   }
 

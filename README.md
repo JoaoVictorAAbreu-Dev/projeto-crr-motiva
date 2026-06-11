@@ -27,6 +27,8 @@ Main outputs:
 - priority ranking with explanations
 - weekly crew planning
 - executive efficiency summary
+- priority distribution view
+- operational alert feed for presentation
 - scenario simulation for weather and crew constraints
 
 Business outcomes emphasized in the board presentation:
@@ -119,7 +121,10 @@ Core endpoints:
 - `GET /api/weekly-plans/{id}`
 - `GET /api/reports/critical-segments`
 - `GET /api/reports/efficiency-summary`
+- `GET /api/reports/priority-distribution`
+- `GET /api/reports/operational-alerts`
 - `GET /api/dashboard/overview`
+- `GET /api/dashboard/assumptions`
 
 Swagger UI:
 

@@ -1,7 +1,9 @@
 import { startTransition, useDeferredValue, useEffect, useState } from "react";
 import { AssumptionsPanel } from "./components/AssumptionsPanel";
+import { CriticalAlertsPanel } from "./components/CriticalAlertsPanel";
 import { FilterToolbar } from "./components/FilterToolbar";
 import { OperationalMap } from "./components/OperationalMap";
+import { PriorityDistributionPanel } from "./components/PriorityDistributionPanel";
 import { RankingTable } from "./components/RankingTable";
 import { ScenarioPanel } from "./components/ScenarioPanel";
 import { SegmentInspector } from "./components/SegmentInspector";
@@ -12,7 +14,9 @@ import type {
   DashboardAssumptions,
   DashboardOverview,
   EfficiencySummary,
+  OperationalAlert,
   PriorityAssessment,
+  PriorityDistributionItem,
   PriorityLevel,
   SegmentDetail,
   SegmentSummary,
@@ -29,6 +33,8 @@ export default function App() {
   const [dashboard, setDashboard] = useState<DashboardOverview | null>(null);
   const [assumptions, setAssumptions] = useState<DashboardAssumptions | null>(null);
   const [efficiency, setEfficiency] = useState<EfficiencySummary | null>(null);
+  const [distribution, setDistribution] = useState<PriorityDistributionItem[]>([]);
+  const [alerts, setAlerts] = useState<OperationalAlert[]>([]);
   const [segments, setSegments] = useState<SegmentSummary[]>([]);
   const deferredSegments = useDeferredValue(segments);
   const [ranking, setRanking] = useState<PriorityAssessment[]>([]);
@@ -45,10 +51,20 @@ export default function App() {
   useEffect(() => {
     async function loadInitialData() {
       try {
-        const [dashboardData, assumptionsData, efficiencyData, segmentsData, rankingData] = await Promise.all([
+        const [
+          dashboardData,
+          assumptionsData,
+          efficiencyData,
+          distributionData,
+          alertsData,
+          segmentsData,
+          rankingData,
+        ] = await Promise.all([
           api.getDashboardOverview(),
           api.getDashboardAssumptions(),
           api.getEfficiencySummary(),
+          api.getPriorityDistribution(),
+          api.getOperationalAlerts(),
           api.getSegments(),
           api.getRanking(),
         ]);
@@ -57,6 +73,8 @@ export default function App() {
           setDashboard(dashboardData);
           setAssumptions(assumptionsData);
           setEfficiency(efficiencyData);
+          setDistribution(distributionData);
+          setAlerts(alertsData);
           setSegments(segmentsData);
           setRanking(rankingData);
           if (segmentsData[0]) {
@@ -87,10 +105,20 @@ export default function App() {
   }, [selectedSegmentId]);
 
   async function refreshData() {
-    const [dashboardData, assumptionsData, efficiencyData, segmentsData, rankingData] = await Promise.all([
+    const [
+      dashboardData,
+      assumptionsData,
+      efficiencyData,
+      distributionData,
+      alertsData,
+      segmentsData,
+      rankingData,
+    ] = await Promise.all([
       api.getDashboardOverview(),
       api.getDashboardAssumptions(),
       api.getEfficiencySummary(),
+      api.getPriorityDistribution(),
+      api.getOperationalAlerts(),
       api.getSegments(),
       api.getRanking(),
     ]);
@@ -99,6 +127,8 @@ export default function App() {
       setDashboard(dashboardData);
       setAssumptions(assumptionsData);
       setEfficiency(efficiencyData);
+      setDistribution(distributionData);
+      setAlerts(alertsData);
       setSegments(segmentsData);
       setRanking(rankingData);
     });
@@ -193,11 +223,13 @@ export default function App() {
         <div className="left-column">
           <OperationalMap segments={filteredSegments} selectedId={selectedSegmentId} onSelect={setSelectedSegmentId} />
           <ScenarioPanel onRecalculate={handleRecalculate} onGeneratePlan={handleGeneratePlan} />
+          <PriorityDistributionPanel distribution={distribution} />
           <RankingTable ranking={filteredRanking} onSelect={setSelectedSegmentId} />
         </div>
 
         <div className="right-column">
           <SegmentInspector segment={selectedSegment} />
+          <CriticalAlertsPanel alerts={alerts} />
           <WeeklyPlanPanel plan={plan} />
           <AssumptionsPanel assumptions={assumptions} />
           <section className="panel report-panel">
@@ -219,6 +251,10 @@ export default function App() {
               <article>
                 <strong>{dashboard?.availableTeams ?? 0}</strong>
                 <span>Equipes disponiveis para a semana</span>
+              </article>
+              <article>
+                <strong>{efficiency?.mediumPrioritySegments ?? 0}</strong>
+                <span>Trechos em observacao ativa</span>
               </article>
             </div>
             <div className="focus-strip">

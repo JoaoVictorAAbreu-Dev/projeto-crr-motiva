@@ -27,9 +27,12 @@ export function OperationalMap({ segments, selectedId, onSelect }: OperationalMa
           <p className="eyebrow">Mapa operacional</p>
           <h2>Trechos do Rodoanel por criticidade</h2>
         </div>
-        <p className="panel-copy">
-          Cada ponto representa um trecho com prioridade calculada pelo motor de decisão.
-        </p>
+        <p className="panel-copy">Cada ponto representa um trecho com prioridade calculada pelo motor de decisao.</p>
+      </div>
+
+      <div className="map-summary-bar">
+        <span>{segments.length} trechos no recorte atual</span>
+        <span>Clique em um ponto para abrir o contexto operacional</span>
       </div>
 
       <div className="map-shell">
@@ -66,9 +69,9 @@ export function OperationalMap({ segments, selectedId, onSelect }: OperationalMa
       </div>
 
       <div className="map-legend">
-        <span><i className="dot critical" />Crítica</span>
+        <span><i className="dot critical" />Critica</span>
         <span><i className="dot high" />Alta</span>
-        <span><i className="dot medium" />Média</span>
+        <span><i className="dot medium" />Media</span>
         <span><i className="dot low" />Baixa</span>
       </div>
     </section>

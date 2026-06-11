@@ -3,7 +3,9 @@ import type {
   DashboardAssumptions,
   DashboardOverview,
   EfficiencySummary,
+  OperationalAlert,
   PriorityAssessment,
+  PriorityDistributionItem,
   SegmentDetail,
   SegmentSummary,
   WeeklyPlan,
@@ -45,5 +47,7 @@ export const api = {
       body: JSON.stringify({ startDate, crewCount, scenarioRainfallMm }),
     }),
   getCriticalSegments: () => apiFetch<CriticalSegmentReportItem[]>("/reports/critical-segments"),
+  getPriorityDistribution: () => apiFetch<PriorityDistributionItem[]>("/reports/priority-distribution"),
+  getOperationalAlerts: () => apiFetch<OperationalAlert[]>("/reports/operational-alerts"),
   getEfficiencySummary: () => apiFetch<EfficiencySummary>("/reports/efficiency-summary"),
 };
