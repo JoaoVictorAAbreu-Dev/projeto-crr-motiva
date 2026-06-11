@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/operationalmap.tsx","./src/components/rankingtable.tsx","./src/components/scenariopanel.tsx","./src/components/segmentinspector.tsx","./src/components/statcard.tsx","./src/components/weeklyplanpanel.tsx","./src/services/api.ts"],"version":"5.9.3"}

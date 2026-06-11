@@ -1,0 +1,12 @@
+work/
+outputs/
+
+backend/target/
+backend/.mvn/
+backend/.idea/
+
+frontend/node_modules/
+frontend/dist/
+
+.DS_Store
+Thumbs.db
