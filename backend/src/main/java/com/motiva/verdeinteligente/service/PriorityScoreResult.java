@@ -6,6 +6,7 @@ import java.util.List;
 public record PriorityScoreResult(
     double score,
     PriorityLevel priorityLevel,
+    double predictedGrassHeightCm,
     List<String> reasons
 ) {
 }

@@ -27,7 +27,10 @@ class PriorityScoringServiceTest {
 
     @BeforeEach
     void setUp() {
-        priorityScoringService = new PriorityScoringService(vegetationRuleProfileRepository);
+        priorityScoringService = new PriorityScoringService(
+            vegetationRuleProfileRepository,
+            new GrassGrowthModelService()
+        );
     }
 
     @Test
@@ -39,6 +42,7 @@ class PriorityScoringServiceTest {
 
         assertThat(result.score()).isGreaterThanOrEqualTo(75);
         assertThat(result.priorityLevel()).isEqualTo(PriorityLevel.CRITICAL);
+        assertThat(result.predictedGrassHeightCm()).isGreaterThan(20);
         assertThat(result.reasons()).isNotEmpty();
     }
 
@@ -51,6 +55,7 @@ class PriorityScoringServiceTest {
 
         assertThat(result.score()).isLessThan(55);
         assertThat(result.priorityLevel()).isNotEqualTo(PriorityLevel.CRITICAL);
+        assertThat(result.predictedGrassHeightCm()).isGreaterThanOrEqualTo(6);
     }
 
     private VegetationRuleProfile profile(VegetationClass vegetationClass, double growthWeight, int cycle) {

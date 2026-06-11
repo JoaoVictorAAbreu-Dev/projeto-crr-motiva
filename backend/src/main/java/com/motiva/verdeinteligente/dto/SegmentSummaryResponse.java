@@ -21,6 +21,8 @@ public record SegmentSummaryResponse(
     boolean contractualPressure,
     double mapX,
     double mapY,
+    double latitude,
+    double longitude,
     double score,
     PriorityLevel priorityLevel,
     String reasons

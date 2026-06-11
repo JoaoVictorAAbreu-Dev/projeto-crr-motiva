@@ -2,18 +2,23 @@ import { startTransition, useDeferredValue, useEffect, useState } from "react";
 import { AssumptionsPanel } from "./components/AssumptionsPanel";
 import { CriticalAlertsPanel } from "./components/CriticalAlertsPanel";
 import { FilterToolbar } from "./components/FilterToolbar";
+import { GrassGrowthPanel } from "./components/GrassGrowthPanel";
 import { OperationalMap } from "./components/OperationalMap";
 import { PriorityDistributionPanel } from "./components/PriorityDistributionPanel";
 import { RankingTable } from "./components/RankingTable";
 import { ScenarioPanel } from "./components/ScenarioPanel";
 import { SegmentInspector } from "./components/SegmentInspector";
 import { StatCard } from "./components/StatCard";
+import { WeatherPanel } from "./components/WeatherPanel";
 import { WeeklyPlanPanel } from "./components/WeeklyPlanPanel";
 import { api } from "./services/api";
 import type {
   DashboardAssumptions,
   DashboardOverview,
   EfficiencySummary,
+  GrassGrowthPrediction,
+  GrassGrowthRankingItem,
+  LiveWeather,
   OperationalAlert,
   PriorityAssessment,
   PriorityDistributionItem,
@@ -40,6 +45,9 @@ export default function App() {
   const [ranking, setRanking] = useState<PriorityAssessment[]>([]);
   const [selectedSegmentId, setSelectedSegmentId] = useState<string | null>(null);
   const [selectedSegment, setSelectedSegment] = useState<SegmentDetail | null>(null);
+  const [liveWeather, setLiveWeather] = useState<LiveWeather | null>(null);
+  const [grassPrediction, setGrassPrediction] = useState<GrassGrowthPrediction | null>(null);
+  const [grassRanking, setGrassRanking] = useState<GrassGrowthRankingItem[]>([]);
   const [plan, setPlan] = useState<WeeklyPlan | null>(null);
   const [selectedHighway, setSelectedHighway] = useState("ALL");
   const [selectedPriority, setSelectedPriority] = useState<PriorityLevel | "ALL">("ALL");
@@ -59,6 +67,7 @@ export default function App() {
           alertsData,
           segmentsData,
           rankingData,
+          grassRankingData,
         ] = await Promise.all([
           api.getDashboardOverview(),
           api.getDashboardAssumptions(),
@@ -67,6 +76,7 @@ export default function App() {
           api.getOperationalAlerts(),
           api.getSegments(),
           api.getRanking(),
+          api.getGrassGrowthRanking(),
         ]);
 
         startTransition(() => {
@@ -77,6 +87,7 @@ export default function App() {
           setAlerts(alertsData);
           setSegments(segmentsData);
           setRanking(rankingData);
+          setGrassRanking(grassRankingData);
           if (segmentsData[0]) {
             setSelectedSegmentId(segmentsData[0].id);
           }
@@ -93,15 +104,33 @@ export default function App() {
 
   useEffect(() => {
     if (!selectedSegmentId) {
+      setSelectedSegment(null);
+      setLiveWeather(null);
+      setGrassPrediction(null);
       return;
     }
 
-    void api
-      .getSegmentDetail(selectedSegmentId)
-      .then((segment) => setSelectedSegment(segment))
-      .catch((requestError) =>
-        setError(requestError instanceof Error ? requestError.message : "Failed to load segment details."),
-      );
+    const segmentId = selectedSegmentId;
+
+    async function loadSegmentInsights() {
+      try {
+        const [segment, weather, prediction] = await Promise.all([
+          api.getSegmentDetail(segmentId),
+          api.getLiveWeather(segmentId),
+          api.getGrassGrowthPrediction(segmentId),
+        ]);
+
+        startTransition(() => {
+          setSelectedSegment(segment);
+          setLiveWeather(weather);
+          setGrassPrediction(prediction);
+        });
+      } catch (requestError) {
+        setError(requestError instanceof Error ? requestError.message : "Failed to load segment details.");
+      }
+    }
+
+    void loadSegmentInsights();
   }, [selectedSegmentId]);
 
   async function refreshData() {
@@ -113,6 +142,7 @@ export default function App() {
       alertsData,
       segmentsData,
       rankingData,
+      grassRankingData,
     ] = await Promise.all([
       api.getDashboardOverview(),
       api.getDashboardAssumptions(),
@@ -121,6 +151,7 @@ export default function App() {
       api.getOperationalAlerts(),
       api.getSegments(),
       api.getRanking(),
+      api.getGrassGrowthRanking(),
     ]);
 
     startTransition(() => {
@@ -131,6 +162,7 @@ export default function App() {
       setAlerts(alertsData);
       setSegments(segmentsData);
       setRanking(rankingData);
+      setGrassRanking(grassRankingData);
     });
   }
 
@@ -139,8 +171,15 @@ export default function App() {
     await api.recalculatePriorities(rainfall, inspectorBoost);
     await refreshData();
     if (selectedSegmentId) {
-      const detail = await api.getSegmentDetail(selectedSegmentId);
+      const segmentId = selectedSegmentId;
+      const [detail, weather, prediction] = await Promise.all([
+        api.getSegmentDetail(segmentId),
+        api.getLiveWeather(segmentId),
+        api.getGrassGrowthPrediction(segmentId),
+      ]);
       setSelectedSegment(detail);
+      setLiveWeather(weather);
+      setGrassPrediction(prediction);
     }
   }
 
@@ -148,6 +187,24 @@ export default function App() {
     setError(null);
     const nextPlan = await api.generateWeeklyPlan(startDate, crewCount, rainfall);
     setPlan(nextPlan);
+  }
+
+  async function handleRefreshWeather() {
+    if (!selectedSegmentId) {
+      return;
+    }
+
+    const segmentId = selectedSegmentId;
+    setError(null);
+    const weather = await api.refreshLiveWeather(segmentId);
+    const [detail, prediction] = await Promise.all([
+      api.getSegmentDetail(segmentId),
+      api.getGrassGrowthPrediction(segmentId),
+    ]);
+    setLiveWeather(weather);
+    setSelectedSegment(detail);
+    setGrassPrediction(prediction);
+    await refreshData();
   }
 
   if (loading) {
@@ -229,6 +286,8 @@ export default function App() {
 
         <div className="right-column">
           <SegmentInspector segment={selectedSegment} />
+          <WeatherPanel weather={liveWeather} onRefresh={handleRefreshWeather} />
+          <GrassGrowthPanel prediction={grassPrediction} ranking={grassRanking.slice(0, 4)} />
           <CriticalAlertsPanel alerts={alerts} />
           <WeeklyPlanPanel plan={plan} />
           <AssumptionsPanel assumptions={assumptions} />

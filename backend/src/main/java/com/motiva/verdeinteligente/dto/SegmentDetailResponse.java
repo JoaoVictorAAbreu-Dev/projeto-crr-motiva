@@ -27,6 +27,8 @@ public record SegmentDetailResponse(
     double humidityPercent,
     double mapX,
     double mapY,
+    double latitude,
+    double longitude,
     String notes,
     double score,
     PriorityLevel priorityLevel,

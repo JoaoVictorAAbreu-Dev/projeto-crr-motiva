@@ -56,6 +56,8 @@ public class RoadSegmentService {
             segment.getHumidityPercent(),
             segment.getMapX(),
             segment.getMapY(),
+            segment.getLatitude(),
+            segment.getLongitude(),
             segment.getNotes(),
             assessment.getScore(),
             assessment.getPriorityLevel(),
@@ -87,6 +89,8 @@ public class RoadSegmentService {
             segment.isContractualPressure(),
             segment.getMapX(),
             segment.getMapY(),
+            segment.getLatitude(),
+            segment.getLongitude(),
             assessment.getScore(),
             assessment.getPriorityLevel(),
             assessment.getReasons().replace("|", " | ")

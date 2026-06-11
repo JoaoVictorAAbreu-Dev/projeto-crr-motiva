@@ -3,11 +3,15 @@ import type {
   DashboardAssumptions,
   DashboardOverview,
   EfficiencySummary,
+  GrassGrowthPrediction,
+  GrassGrowthRankingItem,
+  LiveWeather,
   OperationalAlert,
   PriorityAssessment,
   PriorityDistributionItem,
   SegmentDetail,
   SegmentSummary,
+  WeatherRefresh,
   WeeklyPlan,
 } from "../types";
 
@@ -36,6 +40,12 @@ export const api = {
   getSegments: () => apiFetch<SegmentSummary[]>("/segments"),
   getSegmentDetail: (id: string) => apiFetch<SegmentDetail>(`/segments/${id}`),
   getRanking: () => apiFetch<PriorityAssessment[]>("/priority-ranking"),
+  getLiveWeather: (segmentId: string) => apiFetch<LiveWeather>(`/weather/live/${segmentId}`),
+  refreshLiveWeather: (segmentId: string) =>
+    apiFetch<LiveWeather>(`/weather/live/${segmentId}/refresh`, { method: "POST" }),
+  refreshAllWeather: () => apiFetch<WeatherRefresh>("/weather/live/refresh-all", { method: "POST" }),
+  getGrassGrowthPrediction: (segmentId: string) => apiFetch<GrassGrowthPrediction>(`/ml/grass-growth/${segmentId}`),
+  getGrassGrowthRanking: () => apiFetch<GrassGrowthRankingItem[]>("/ml/grass-growth/ranking"),
   recalculatePriorities: (rainfallDeltaMm: number, inspectorSignalBoost: number) =>
     apiFetch<PriorityAssessment[]>("/priority-assessments/recalculate", {
       method: "POST",

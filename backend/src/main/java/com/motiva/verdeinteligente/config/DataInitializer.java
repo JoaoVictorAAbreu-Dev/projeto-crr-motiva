@@ -43,14 +43,14 @@ public class DataInitializer {
             vegetationRuleProfileRepository.saveAll(List.of(controlled, moderate, aggressive));
 
             List<RoadSegment> segments = List.of(
-                createSegment("Rodoanel Oeste", "Trecho Barueri Norte", 0.0, 4.8, VegetationClass.MODERATE, OperationalCriticality.HIGH, 32, 28, true, true, 5, 4, 44, 29, 76, 15, 22, "High truck flow and visibility demand."),
-                createSegment("Rodoanel Oeste", "Trecho Osasco Sul", 5.0, 9.2, VegetationClass.AGGRESSIVE, OperationalCriticality.HIGH, 39, 24, true, true, 6, 5, 58, 30, 81, 26, 40, "Repeated regrowth near access ramps."),
-                createSegment("Rodoanel Oeste", "Trecho Embu das Artes", 9.3, 13.8, VegetationClass.AGGRESSIVE, OperationalCriticality.MEDIUM, 27, 25, false, true, 5, 3, 52, 27, 79, 37, 52, "Fast vegetation growth after rainfall concentration."),
-                createSegment("Rodoanel Oeste", "Trecho Cotia Leste", 13.9, 18.0, VegetationClass.MODERATE, OperationalCriticality.MEDIUM, 18, 30, false, false, 3, 2, 35, 26, 70, 49, 36, "Moderate recurrence with medium roadside exposure."),
-                createSegment("Rodoanel Oeste", "Trecho Carapicuiba", 18.1, 22.3, VegetationClass.CONTROLLED, OperationalCriticality.LOW, 12, 35, false, false, 2, 1, 22, 24, 65, 61, 18, "Under control but still monitored."),
-                createSegment("Rodoanel Oeste", "Trecho Itapevi Operacional", 22.4, 26.9, VegetationClass.MODERATE, OperationalCriticality.HIGH, 34, 26, true, true, 4, 4, 46, 28, 78, 73, 28, "Maintenance delays impact operations near junction."),
-                createSegment("Rodoanel Oeste", "Trecho Jandira Perimetral", 27.0, 31.0, VegetationClass.CONTROLLED, OperationalCriticality.MEDIUM, 20, 32, false, false, 3, 2, 26, 25, 67, 84, 38, "Planned surveillance area."),
-                createSegment("Rodoanel Oeste", "Trecho Alphaville Conector", 31.1, 35.4, VegetationClass.AGGRESSIVE, OperationalCriticality.HIGH, 41, 21, true, true, 6, 5, 63, 30, 82, 92, 20, "Critical corridor with sensitive margins and high recurrence.")
+                createSegment("Rodoanel Oeste", "Trecho Barueri Norte", 0.0, 4.8, VegetationClass.MODERATE, OperationalCriticality.HIGH, 32, 28, true, true, 5, 4, 44, 29, 76, 15, 22, -23.507, -46.879, "High truck flow and visibility demand."),
+                createSegment("Rodoanel Oeste", "Trecho Osasco Sul", 5.0, 9.2, VegetationClass.AGGRESSIVE, OperationalCriticality.HIGH, 39, 24, true, true, 6, 5, 58, 30, 81, 26, 40, -23.532, -46.792, "Repeated regrowth near access ramps."),
+                createSegment("Rodoanel Oeste", "Trecho Embu das Artes", 9.3, 13.8, VegetationClass.AGGRESSIVE, OperationalCriticality.MEDIUM, 27, 25, false, true, 5, 3, 52, 27, 79, 37, 52, -23.651, -46.852, "Fast vegetation growth after rainfall concentration."),
+                createSegment("Rodoanel Oeste", "Trecho Cotia Leste", 13.9, 18.0, VegetationClass.MODERATE, OperationalCriticality.MEDIUM, 18, 30, false, false, 3, 2, 35, 26, 70, 49, 36, -23.604, -46.919, "Moderate recurrence with medium roadside exposure."),
+                createSegment("Rodoanel Oeste", "Trecho Carapicuiba", 18.1, 22.3, VegetationClass.CONTROLLED, OperationalCriticality.LOW, 12, 35, false, false, 2, 1, 22, 24, 65, 61, 18, -23.523, -46.840, "Under control but still monitored."),
+                createSegment("Rodoanel Oeste", "Trecho Itapevi Operacional", 22.4, 26.9, VegetationClass.MODERATE, OperationalCriticality.HIGH, 34, 26, true, true, 4, 4, 46, 28, 78, 73, 28, -23.548, -46.936, "Maintenance delays impact operations near junction."),
+                createSegment("Rodoanel Oeste", "Trecho Jandira Perimetral", 27.0, 31.0, VegetationClass.CONTROLLED, OperationalCriticality.MEDIUM, 20, 32, false, false, 3, 2, 26, 25, 67, 84, 38, -23.529, -46.904, "Planned surveillance area."),
+                createSegment("Rodoanel Oeste", "Trecho Alphaville Conector", 31.1, 35.4, VegetationClass.AGGRESSIVE, OperationalCriticality.HIGH, 41, 21, true, true, 6, 5, 63, 30, 82, 92, 20, -23.490, -46.845, "Critical corridor with sensitive margins and high recurrence.")
             );
             roadSegmentRepository.saveAll(segments);
 
@@ -92,6 +92,8 @@ public class DataInitializer {
         double humidity,
         double mapX,
         double mapY,
+        double latitude,
+        double longitude,
         String notes
     ) {
         RoadSegment segment = new RoadSegment();
@@ -113,6 +115,8 @@ public class DataInitializer {
         segment.setHumidityPercent(humidity);
         segment.setMapX(mapX);
         segment.setMapY(mapY);
+        segment.setLatitude(latitude);
+        segment.setLongitude(longitude);
         segment.setNotes(notes);
         return segment;
     }

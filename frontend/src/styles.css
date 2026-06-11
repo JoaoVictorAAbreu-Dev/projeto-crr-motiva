@@ -84,7 +84,9 @@ select {
 .empty-state,
 .segment-notes,
 .alert-card p,
-.distribution-card p {
+.distribution-card p,
+.report-card-lite span,
+.rank-mini-list p {
   color: var(--muted);
 }
 
@@ -118,7 +120,9 @@ select {
 .assumptions-grid,
 .assumptions-list-grid,
 .distribution-list,
-.alerts-list {
+.alerts-list,
+.weather-grid,
+.rank-mini-list {
   display: grid;
   gap: 18px;
 }
@@ -310,7 +314,8 @@ select {
 }
 
 .scenario-grid,
-.filters-grid {
+.filters-grid,
+.weather-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -320,6 +325,10 @@ select {
 .assumptions-grid,
 .assumptions-list-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rank-mini-list {
+  margin-top: 18px;
 }
 
 .scenario-grid label,
@@ -398,10 +407,20 @@ select {
 .alert-card,
 .report-grid article,
 .assumptions-grid article,
-.assumptions-list-grid > div {
+.assumptions-list-grid > div,
+.report-card-lite {
   padding: 18px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.03);
+}
+
+.report-card-lite strong,
+.report-grid strong,
+.distribution-card strong {
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
 }
 
 .alert-card span {
@@ -433,14 +452,6 @@ select {
   margin-top: 6px;
 }
 
-.report-grid strong,
-.distribution-card strong {
-  display: block;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-}
-
 @media (max-width: 1080px) {
   .stats-grid,
   .main-grid,
@@ -450,7 +461,8 @@ select {
   .assumptions-grid,
   .assumptions-list-grid,
   .distribution-list,
-  .alerts-list {
+  .alerts-list,
+  .weather-grid {
     grid-template-columns: 1fr;
   }
 

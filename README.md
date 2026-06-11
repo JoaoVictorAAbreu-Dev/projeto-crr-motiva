@@ -125,6 +125,11 @@ Core endpoints:
 - `GET /api/reports/operational-alerts`
 - `GET /api/dashboard/overview`
 - `GET /api/dashboard/assumptions`
+- `GET /api/weather/live/{segmentId}`
+- `POST /api/weather/live/{segmentId}/refresh`
+- `POST /api/weather/live/refresh-all`
+- `GET /api/ml/grass-growth/{segmentId}`
+- `GET /api/ml/grass-growth/ranking`
 
 Swagger UI:
 
@@ -200,6 +205,8 @@ Backend:
 - `SPRING_DATASOURCE_USERNAME`
 - `SPRING_DATASOURCE_PASSWORD`
 - `APP_CORS_ALLOWED_ORIGINS`
+- `OPENWEATHER_API_KEY`
+- `OPENWEATHER_BASE_URL`
 
 Frontend:
 - `VITE_API_BASE_URL`

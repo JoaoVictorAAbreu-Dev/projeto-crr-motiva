@@ -70,6 +70,12 @@ public class RoadSegment {
     @Column(nullable = false)
     private double mapY;
 
+    @Column(nullable = false)
+    private double latitude;
+
+    @Column(nullable = false)
+    private double longitude;
+
     @Column(length = 500)
     private String notes;
 
@@ -234,6 +240,22 @@ public class RoadSegment {
 
     public void setMapY(double mapY) {
         this.mapY = mapY;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public String getNotes() {

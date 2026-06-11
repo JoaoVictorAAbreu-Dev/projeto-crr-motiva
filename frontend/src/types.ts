@@ -15,6 +15,8 @@ export interface SegmentSummary {
   contractualPressure: boolean;
   mapX: number;
   mapY: number;
+  latitude: number;
+  longitude: number;
   score: number;
   priorityLevel: PriorityLevel;
   reasons: string;
@@ -33,6 +35,8 @@ export interface SegmentDetail {
   historicalFrequencyDays: number;
   mapX: number;
   mapY: number;
+  latitude: number;
+  longitude: number;
   score: number;
   priorityLevel: PriorityLevel;
   sensitiveArea: boolean;
@@ -44,6 +48,42 @@ export interface SegmentDetail {
   humidityPercent: number;
   notes: string;
   reasons: string[];
+}
+
+export interface LiveWeather {
+  segmentId: string;
+  segmentName: string;
+  liveData: boolean;
+  snapshotDate: string;
+  rainfallMm: number;
+  temperatureCelsius: number;
+  humidityPercent: number;
+  source: string;
+}
+
+export interface WeatherRefresh {
+  refreshedSegments: number;
+  liveProviderUsed: boolean;
+  snapshots: LiveWeather[];
+}
+
+export interface GrassGrowthPrediction {
+  segmentId: string;
+  segmentName: string;
+  predictedGrassHeightCm: number;
+  expectedDailyGrowthCm: number;
+  daysToCriticalHeight: number;
+  confidenceScore: number;
+  modelVersion: string;
+  drivers: string[];
+}
+
+export interface GrassGrowthRankingItem {
+  segmentId: string;
+  segmentName: string;
+  predictedGrassHeightCm: number;
+  daysToCriticalHeight: number;
+  recommendation: string;
 }
 
 export interface PriorityAssessment {

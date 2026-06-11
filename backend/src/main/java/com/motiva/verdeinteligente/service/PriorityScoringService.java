@@ -15,29 +15,37 @@ import org.springframework.stereotype.Service;
 public class PriorityScoringService {
 
     private final VegetationRuleProfileRepository ruleProfileRepository;
+    private final GrassGrowthModelService grassGrowthModelService;
 
-    public PriorityScoringService(VegetationRuleProfileRepository ruleProfileRepository) {
+    public PriorityScoringService(
+        VegetationRuleProfileRepository ruleProfileRepository,
+        GrassGrowthModelService grassGrowthModelService
+    ) {
         this.ruleProfileRepository = ruleProfileRepository;
+        this.grassGrowthModelService = grassGrowthModelService;
     }
 
     public PriorityScoreResult calculate(RoadSegment segment, double rainfallDeltaMm, int inspectorBoost) {
         VegetationRuleProfile profile = ruleProfileRepository.findByVegetationClass(segment.getVegetationClass())
             .orElseThrow(() -> new IllegalStateException("Missing vegetation rule profile for " + segment.getVegetationClass()));
 
+        GrassGrowthPredictionResult growthPrediction = grassGrowthModelService.predict(segment);
         long daysSinceLastMowing = ChronoUnit.DAYS.between(segment.getLastMowingDate(), LocalDate.now());
-        double cyclePressure = Math.min(30.0, (daysSinceLastMowing * 30.0) / profile.getIdealMaintenanceCycleDays());
-        double rainfallPressure = Math.min(15.0, (segment.getRecentRainfallMm() + rainfallDeltaMm) / 4.0);
+        double cyclePressure = Math.min(28.0, (daysSinceLastMowing * 30.0) / profile.getIdealMaintenanceCycleDays());
+        double rainfallPressure = Math.min(14.0, (segment.getRecentRainfallMm() + rainfallDeltaMm) / 4.0);
         double temperaturePressure = segment.getAverageTemperatureCelsius() >= 28 ? 6.0 : 3.0;
         double humidityPressure = segment.getHumidityPercent() >= 75 ? 4.0 : 2.0;
         double recurrencePressure = Math.min(10.0, segment.getRecurrenceIndex() * 1.5);
         double sensitiveAreaPressure = segment.isSensitiveArea() ? 10.0 : 0.0;
         double contractualPressure = segment.isContractualPressure() ? 8.0 : 0.0;
         double inspectorPressure = Math.min(10.0, (segment.getInspectorSignal() + inspectorBoost) * 2.0);
-        double growthPressure = profile.getGrowthWeight() * 8.0;
+        double predictedHeightPressure = Math.min(18.0, growthPrediction.predictedGrassHeightCm() / 1.8);
+        double daysToCriticalPressure = growthPrediction.daysToCriticalHeight() <= 3 ? 9.0 : growthPrediction.daysToCriticalHeight() <= 7 ? 5.0 : 2.0;
         double operationalPressure = operationalWeight(segment.getOperationalCriticality());
 
         double rawScore = cyclePressure + rainfallPressure + temperaturePressure + humidityPressure + recurrencePressure
-            + sensitiveAreaPressure + contractualPressure + inspectorPressure + growthPressure + operationalPressure;
+            + sensitiveAreaPressure + contractualPressure + inspectorPressure + predictedHeightPressure + daysToCriticalPressure
+            + operationalPressure;
         double score = Math.min(100.0, Math.round(rawScore * 10.0) / 10.0);
 
         List<String> reasons = new ArrayList<>();
@@ -49,6 +57,12 @@ public class PriorityScoringService {
         }
         if (temperaturePressure >= 6.0 && humidityPressure >= 4.0) {
             reasons.add("Heat and humidity conditions increase regrowth speed and fire-prevention urgency.");
+        }
+        if (predictedHeightPressure >= 12.0) {
+            reasons.add("ML prediction indicates elevated grass height and faster reach to critical limits.");
+        }
+        if (growthPrediction.daysToCriticalHeight() <= 3) {
+            reasons.add("Predicted time to critical height is below 72 hours.");
         }
         if (sensitiveAreaPressure > 0) {
             reasons.add("Sensitive roadside area requires preventive attention for visibility and infrastructure protection.");
@@ -66,7 +80,7 @@ public class PriorityScoringService {
             reasons.add("Segment remains under monitored operational control.");
         }
 
-        return new PriorityScoreResult(score, classify(score), reasons);
+        return new PriorityScoreResult(score, classify(score), growthPrediction.predictedGrassHeightCm(), reasons);
     }
 
     private double operationalWeight(OperationalCriticality criticality) {

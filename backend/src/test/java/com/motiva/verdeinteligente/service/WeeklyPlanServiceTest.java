@@ -55,7 +55,7 @@ class WeeklyPlanServiceTest {
         when(teamRepository.findAllByOrderByNameAsc()).thenReturn(List.of(team));
         when(priorityAssessmentRepository.findAll()).thenReturn(List.of(assessment));
         when(priorityScoringService.calculate(assessment.getRoadSegment(), 0.0, 0))
-            .thenReturn(new PriorityScoreResult(88, PriorityLevel.CRITICAL, List.of("Critical")));
+            .thenReturn(new PriorityScoreResult(88, PriorityLevel.CRITICAL, 34.5, List.of("Critical")));
 
         WeeklyPlanResponse response = weeklyPlanService.generate(new WeeklyPlanRequest(LocalDate.now(), 1, 0.0));
 
