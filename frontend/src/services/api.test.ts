@@ -48,7 +48,7 @@ describe("api service", () => {
       "fetch",
       vi.fn().mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ username: "motiva.admin", fullName: "Operador Motiva", role: "MANAGER" }),
+        json: () => Promise.resolve({ username: "motiva.admin", fullName: "Portfolio Operator", role: "MANAGER" }),
       }),
     );
 

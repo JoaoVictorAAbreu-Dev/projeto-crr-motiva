@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 
-echo [Motiva Verde Inteligente] Iniciando ambiente local...
+echo [GreenOps Control Center] Iniciando ambiente local...
 
 if not exist ".env" (
   if exist ".env.example" (
@@ -21,7 +21,7 @@ if %errorlevel%==0 (
 echo [Docker] Nao encontrado.
 echo [Info] Vou iniciar somente o frontend em uma nova janela.
 echo [Info] Para o backend, instale Maven e execute: cd backend ^&^& mvn spring-boot:run
-start "Motiva Frontend" cmd /k "cd /d %~dp0frontend && npm.cmd install && npm.cmd run dev"
+start "GreenOps Frontend" cmd /k "cd /d %~dp0frontend && npm.cmd install && npm.cmd run dev"
 
 echo [Concluido] Frontend iniciado.
 echo [Proximo passo] Suba o backend manualmente se o Maven estiver instalado.

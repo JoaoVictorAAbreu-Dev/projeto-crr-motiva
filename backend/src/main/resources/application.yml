@@ -1,6 +1,6 @@
 spring:
   application:
-    name: motiva-verde-inteligente
+    name: greenops-control-center
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/motiva_verde}
     username: ${SPRING_DATASOURCE_USERNAME:motiva}
@@ -24,9 +24,9 @@ app:
     demo-user:
       username: ${APP_AUTH_DEMO_USERNAME:motiva.admin}
       password: ${APP_AUTH_DEMO_PASSWORD:motiva@123}
-      full-name: ${APP_AUTH_DEMO_FULL_NAME:Operador Motiva}
+      full-name: ${APP_AUTH_DEMO_FULL_NAME:Portfolio Operator}
       role: ${APP_AUTH_DEMO_ROLE:MANAGER}
-    jwt-secret: ${APP_AUTH_JWT_SECRET:motiva-verde-inteligente-jwt-secret-2026-safe-key}
+    jwt-secret: ${APP_AUTH_JWT_SECRET:greenops-control-center-jwt-secret-2026-safe-key}
     token-expiration-hours: ${APP_AUTH_TOKEN_EXPIRATION_HOURS:12}
   weather:
     provider: openweather

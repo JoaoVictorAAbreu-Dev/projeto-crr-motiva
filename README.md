@@ -1,41 +1,41 @@
-# Motiva Verde Inteligente
+# GreenOps Control Center
 
-Motiva Verde Inteligente is a web platform for operational vegetation management along highways. The project was designed as a decision support center for CCR Motiva, helping conservation teams decide where to intervene first, when to intervene, and how to distribute field crews across the week.
+GreenOps Control Center is a portfolio-grade decision support platform for highway vegetation operations. It demonstrates how to combine operational rules, weather context, explainable prioritization, weekly crew planning, and secure API delivery in a single full-stack product.
 
-The prototype focuses on the challenge described by the academic brief:
-- reduce waste caused by fixed mowing schedules
-- identify critical stretches earlier
-- justify field decisions with data
-- present a clear flow of `input -> processing -> operational output`
+The project is positioned as an operational intelligence product rather than a dashboard-only prototype. It focuses on a clear flow of `input -> processing -> operational output`:
 
-The project also incorporates clarifications answered by Motiva in the challenge questionnaire:
-- simulated or aggregated data is acceptable when the assumptions are consistent
-- the goal is to propose operational improvements, not just replicate the current process
-- climate, safety, and contractual restrictions should influence the decision logic
-- Motiva cameras should not be treated as an MVP dependency because of LGPD and data sensitivity
-- the solution should favor precision, cost efficiency, scalability, and simple implementation
+- segment and maintenance data enter the system
+- the prioritization engine scores intervention urgency
+- planners receive an explainable ranking, map view, weather context, and weekly execution plan
 
-## Solution Overview
+## Product Overview
 
-Motiva Verde Inteligente is positioned as an explainable operational prioritization platform rather than a generic CRUD system.
+GreenOps Control Center helps maintenance teams answer three core questions:
 
-The platform combines historical maintenance events, weather context, vegetation growth profiles, operational criticality, and manual inspection signals to calculate an `Intervention Priority Index (IPI)` for each road segment.
+- where should the next intervention happen first
+- when should the intervention happen
+- how should the available crews be allocated across the week
 
 Main outputs:
-- criticality dashboard
-- operational map by segment
-- priority ranking with explanations
-- weekly crew planning
-- executive efficiency summary
-- priority distribution view
-- operational alert feed for presentation
-- scenario simulation for weather and crew constraints
 
-Business outcomes emphasized in the board presentation:
-- reduce unnecessary mowing cycles
-- anticipate roadside safety risk
-- improve use of crews, equipment, and logistics
-- justify operational decisions with transparent criteria
+- operational dashboard with executive metrics
+- explainable intervention priority index per segment
+- criticality map with segment inspection
+- weather snapshot and grass-growth projection
+- weekly crew plan generation
+- efficiency summary against fixed scheduling
+- protected API with JWT authentication
+
+## Why This Project Works as Portfolio
+
+This repository demonstrates end-to-end engineering work across:
+
+- backend architecture with Spring Boot, validation, security, and API design
+- frontend application structure with React, TypeScript, component decomposition, and API integration
+- explainable business logic for prioritization and planning
+- automated tests in backend controllers and frontend components/services
+- environment-based configuration and local startup scripts
+- OpenAPI documentation and Dockerized setup
 
 ## Tech Stack
 
@@ -43,76 +43,43 @@ Business outcomes emphasized in the board presentation:
 - Database: PostgreSQL
 - Frontend: React, TypeScript, Vite
 - Infra: Docker, Docker Compose
-- Tests: JUnit 5, Mockito, Spring MVC Test
+- Tests: JUnit 5, Mockito, Spring MVC Test, Vitest, Testing Library
 
-## Project Structure
-
-```text
-backend/
-  src/main/java/com/motiva/verdeinteligente/
-  src/main/resources/
-  src/test/java/com/motiva/verdeinteligente/
-frontend/
-  src/
-docker-compose.yml
-.env.example
-```
-
-## MVP Features
+## Core Features
 
 - road segment catalog with operational metadata
-- transparent IPI recalculation
-- criticality ranking
+- transparent intervention priority index recalculation
+- explainable priority ranking
 - operational map with clickable segments
+- weather snapshot refresh and fallback simulation
+- grass-height prediction with simple ML-based estimation
 - weekly plan generation based on crew capacity
-- fixed-schedule vs intelligent-plan comparison
-- scenario simulator for rainfall and available crews
+- fixed-schedule versus intelligent-plan comparison
 - JWT login for operational access and protected APIs
 
-## Business Rules
+## Decision Model
 
-The IPI score ranges from `0` to `100` and is calculated from:
-- days since the last mowing
+The intervention priority index ranges from `0` to `100` and considers:
+
+- days since last mowing
 - recent rainfall
-- humidity and temperature
+- temperature and humidity
 - vegetation growth profile
 - operational criticality
-- recurrence of past interventions
-- sensitive-area proximity
+- recurrence of prior interventions
+- sensitive-area pressure
 - contractual pressure
-- inspector signal
+- field inspector signal
+- predicted grass height and time-to-critical threshold
 
-The engine is intentionally explainable. Every calculated score returns the reasons that increased urgency.
-
-Safety is explicit in the decision model:
-- driver visibility risk
-- fire-prevention pressure
-- roadside infrastructure exposure
-- access conditions for response teams
-
-Contract compliance is also explicit in the score, because the challenge questionnaire reinforced the importance of concession obligations and labor constraints.
-
-## Simulation Premises
-
-The current MVP uses simulated but consistent data, which is aligned with Motiva's own recommendation for the challenge.
-
-Reference premises used in the prototype:
-- climate affects vegetation growth and intervention timing
-- fixed schedules create avoidable waste in part of the network
-- high-traffic or operationally sensitive stretches demand faster action
-- not every segment needs the same intervention frequency
-
-Cost references incorporated into the ROI narrative:
-- manual mowing: `R$ 0,20 to R$ 0,40 / m²`
-- mechanical mowing: `R$ 0,10 to R$ 0,23 / m²`
-- annual reference cycles: `13 to 18 mowing cycles`
-
-The executive savings summary uses these values as reference inputs for scenario comparison. They are not presented as audited production values.
+The model is intentionally explainable. Every score returns a reason list so the recommendation can be defended operationally.
 
 ## API Summary
 
 Core endpoints:
 
+- `POST /api/auth/login`
+- `GET /api/auth/me`
 - `GET /api/segments`
 - `GET /api/segments/{id}`
 - `GET /api/priority-ranking`
@@ -131,12 +98,23 @@ Core endpoints:
 - `POST /api/weather/live/refresh-all`
 - `GET /api/ml/grass-growth/{segmentId}`
 - `GET /api/ml/grass-growth/ranking`
-- `POST /api/auth/login`
-- `GET /api/auth/me`
 
 Swagger UI:
 
 - `http://localhost:8080/swagger-ui.html`
+
+## Project Structure
+
+```text
+backend/
+  src/main/java/com/motiva/verdeinteligente/
+  src/main/resources/
+  src/test/java/com/motiva/verdeinteligente/
+frontend/
+  src/
+docker-compose.yml
+.env.example
+```
 
 ## Setup
 
@@ -149,6 +127,7 @@ start-frontend.cmd
 ```
 
 What each script does:
+
 - `check-local.cmd`: verifies `.env`, Java, Maven, Docker, and npm
 - `start-local.cmd`: prefers `docker compose up --build`; if Docker is missing, it starts the frontend and tells you how to run the backend
 - `start-frontend.cmd`: installs dependencies and starts the React app directly
@@ -156,6 +135,7 @@ What each script does:
 ### Option 1: Docker Compose
 
 Requirements:
+
 - Docker Desktop
 
 Steps:
@@ -168,17 +148,21 @@ docker compose up --build
 ```
 
 Frontend:
+
 - `http://localhost:5173`
 
 Backend:
+
 - `http://localhost:8080`
 
 PostgreSQL:
+
 - `localhost:5432`
 
 ### Option 2: Local Development
 
 Requirements:
+
 - Java 21+
 - Maven 3.9+
 - Node 22+
@@ -204,6 +188,7 @@ npm run dev
 Use `.env.example` as the base configuration.
 
 Backend:
+
 - `SPRING_DATASOURCE_URL`
 - `SPRING_DATASOURCE_USERNAME`
 - `SPRING_DATASOURCE_PASSWORD`
@@ -218,6 +203,7 @@ Backend:
 - `OPENWEATHER_BASE_URL`
 
 Frontend:
+
 - `VITE_API_BASE_URL`
 
 ## Testing
@@ -238,39 +224,36 @@ npm test
 npm run build
 ```
 
-## Demo Flow
+## Demo Credentials
 
-Recommended presentation flow for the academic board:
+Default demo operator:
 
-1. Show the executive dashboard and the current operational backlog.
-2. Open the map and explain how each segment is classified.
-3. Select a critical segment and show the reasons behind the IPI.
-4. Recalculate priorities after changing rainfall and inspector signals.
-5. Generate a weekly plan with limited crew capacity.
-6. Compare fixed-schedule maintenance versus intelligent prioritization.
-7. Close by explaining that the MVP is intentionally explainable, low-dependency, and scalable.
+- username: `motiva.admin`
+- password: `motiva@123`
 
-## Risks and Limitations
+These credentials are environment-driven and can be changed through `.env`.
 
-- Initial road geometries are simulated to keep the prototype demonstrable.
-- Operational and cost premises are simulated from challenge references, not from audited Motiva production systems.
-- The weather layer supports OpenWeather snapshots when the API key is configured and falls back to simulation otherwise.
-- Authentication uses a protected demo operator profile for presentation and should evolve to a real user store for production.
-- Computer vision, IoT, and smart camera integrations are treated as future evolutions, not MVP dependencies.
-
-## Tests Added
+## Automated Tests Included
 
 - unit tests for priority scoring
 - unit tests for weekly plan generation
-- controller tests for priority ranking and plan generation
-- controller tests for auth and road segments
-- frontend component and API tests with Vitest and Testing Library
+- controller tests for auth, road segments, priority ranking, reports, and weekly plan generation
+- frontend component tests for login, weather, and grass-growth panels
+- frontend service tests for API request and error handling
 
-## Pending Improvements
+## Risks and Limitations
 
-- ingest KMZ and Excel files automatically
+- initial road geometries are simulated to keep the product demonstrable
+- operational and cost premises are representative, not audited production values
+- the weather layer uses OpenWeather when configured and falls back to simulation otherwise
+- authentication currently uses a protected demo operator instead of a persistent user table
+- computer vision, IoT, and external GIS integrations are treated as future expansions
+
+## Roadmap
+
 - add database-backed users and role-based permissions
-- export PDF/CSV reports
-- connect with real weather APIs and GIS layers
+- ingest KMZ and spreadsheet sources automatically
+- export PDF and CSV operational reports
+- connect with richer GIS and weather providers
 - persist scenario simulations for audit history
-- add optional future modules for IoT sensing and external computer-vision ingestion without depending on Motiva camera infrastructure
+- add observability, monitoring, and deployment workflows

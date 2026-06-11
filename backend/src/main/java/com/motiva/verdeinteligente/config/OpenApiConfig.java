@@ -22,7 +22,7 @@ public class OpenApiConfig {
                     .bearerFormat("JWT")))
             .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
             .info(new Info()
-                .title("Motiva Verde Inteligente API")
+                .title("GreenOps Control Center API")
                 .description("Operational decision API for highway vegetation management.")
                 .version("v1")
                 .contact(new Contact().name("TaskFlow Dev")));

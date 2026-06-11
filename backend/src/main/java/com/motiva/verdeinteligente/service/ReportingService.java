@@ -106,10 +106,10 @@ public class ReportingService {
 
     public DashboardAssumptionsResponse dashboardAssumptions() {
         return new DashboardAssumptionsResponse(
-            "The MVP uses simulated but consistent data, which is acceptable under Motiva's challenge guidance.",
+            "The MVP uses simulated but internally consistent data so the decision engine remains demonstrable and reproducible.",
             "The recommendation engine favors explainable operational prioritization over black-box automation.",
             "Safety variables explicitly cover visibility, fire-prevention urgency, and roadside access conditions.",
-            "Motiva cameras are not part of the MVP because of LGPD and data-sensitivity constraints.",
+            "Camera and computer-vision feeds are treated as optional integrations rather than MVP dependencies.",
             List.of(
                 "Manual mowing reference: R$ 0,20 to R$ 0,40 per m2",
                 "Mechanical mowing reference: R$ 0,10 to R$ 0,23 per m2"

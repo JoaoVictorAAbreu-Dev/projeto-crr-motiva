@@ -37,7 +37,7 @@ class AuthControllerTest {
     void shouldAuthenticateAndReturnToken() throws Exception {
         LoginRequest request = new LoginRequest("motiva.admin", "motiva@123");
         when(authService.login(request)).thenReturn(
-            new AuthTokenResponse("token", "Bearer", LocalDateTime.of(2026, 6, 11, 22, 0), "motiva.admin", "Operador Motiva", "MANAGER")
+            new AuthTokenResponse("token", "Bearer", LocalDateTime.of(2026, 6, 11, 22, 0), "motiva.admin", "Portfolio Operator", "MANAGER")
         );
 
         mockMvc.perform(post("/api/auth/login")
@@ -50,11 +50,11 @@ class AuthControllerTest {
 
     @Test
     void shouldReturnCurrentUser() throws Exception {
-        when(authService.currentUser()).thenReturn(new AuthenticatedUserResponse("motiva.admin", "Operador Motiva", "MANAGER"));
+        when(authService.currentUser()).thenReturn(new AuthenticatedUserResponse("motiva.admin", "Portfolio Operator", "MANAGER"));
 
         mockMvc.perform(get("/api/auth/me"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.fullName").value("Operador Motiva"))
+            .andExpect(jsonPath("$.fullName").value("Portfolio Operator"))
             .andExpect(jsonPath("$.role").value("MANAGER"));
     }
 }

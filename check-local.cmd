@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 
-echo === Motiva Verde Inteligente - Check Local ===
+echo === GreenOps Control Center - Check Local ===
 
 if exist ".env" (
   echo [OK] .env encontrado

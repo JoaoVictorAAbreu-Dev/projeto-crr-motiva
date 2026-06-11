@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.motiva</groupId>
-    <artifactId>verde-inteligente</artifactId>
+    <artifactId>greenops-control-center</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>motiva-verde-inteligente</name>
+    <name>greenops-control-center</name>
     <description>Decision support platform for highway vegetation management.</description>
 
     <properties>

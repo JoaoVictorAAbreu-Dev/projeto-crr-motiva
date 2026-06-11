@@ -274,7 +274,7 @@ export default function App() {
       <header className="hero">
         <div>
           <p className="hero-kicker">Plataforma de priorizacao operacional explicavel</p>
-          <h1>Motiva Verde Inteligente</h1>
+          <h1>GreenOps Control Center</h1>
           <p className="hero-copy">
             Plataforma para usar dados simulados consistentes, antecipar risco viario, reduzir rocadas
             desnecessarias e distribuir equipes com base em clima, seguranca e restricoes contratuais.
