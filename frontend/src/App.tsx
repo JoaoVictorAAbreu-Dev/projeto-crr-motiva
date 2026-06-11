@@ -3,6 +3,7 @@ import { AssumptionsPanel } from "./components/AssumptionsPanel";
 import { CriticalAlertsPanel } from "./components/CriticalAlertsPanel";
 import { FilterToolbar } from "./components/FilterToolbar";
 import { GrassGrowthPanel } from "./components/GrassGrowthPanel";
+import { LoginPanel } from "./components/LoginPanel";
 import { OperationalMap } from "./components/OperationalMap";
 import { PriorityDistributionPanel } from "./components/PriorityDistributionPanel";
 import { RankingTable } from "./components/RankingTable";
@@ -11,8 +12,9 @@ import { SegmentInspector } from "./components/SegmentInspector";
 import { StatCard } from "./components/StatCard";
 import { WeatherPanel } from "./components/WeatherPanel";
 import { WeeklyPlanPanel } from "./components/WeeklyPlanPanel";
-import { api } from "./services/api";
+import { api, authSession } from "./services/api";
 import type {
+  AuthenticatedUser,
   DashboardAssumptions,
   DashboardOverview,
   EfficiencySummary,
@@ -35,6 +37,7 @@ const currency = new Intl.NumberFormat("pt-BR", {
 });
 
 export default function App() {
+  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>(null);
   const [dashboard, setDashboard] = useState<DashboardOverview | null>(null);
   const [assumptions, setAssumptions] = useState<DashboardAssumptions | null>(null);
   const [efficiency, setEfficiency] = useState<EfficiencySummary | null>(null);
@@ -55,55 +58,35 @@ export default function App() {
   const [sensitiveOnly, setSensitiveOnly] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    async function loadInitialData() {
-      try {
-        const [
-          dashboardData,
-          assumptionsData,
-          efficiencyData,
-          distributionData,
-          alertsData,
-          segmentsData,
-          rankingData,
-          grassRankingData,
-        ] = await Promise.all([
-          api.getDashboardOverview(),
-          api.getDashboardAssumptions(),
-          api.getEfficiencySummary(),
-          api.getPriorityDistribution(),
-          api.getOperationalAlerts(),
-          api.getSegments(),
-          api.getRanking(),
-          api.getGrassGrowthRanking(),
-        ]);
+    async function bootstrap() {
+      const token = authSession.getToken();
+      if (!token) {
+        setLoading(false);
+        setAuthLoading(false);
+        return;
+      }
 
-        startTransition(() => {
-          setDashboard(dashboardData);
-          setAssumptions(assumptionsData);
-          setEfficiency(efficiencyData);
-          setDistribution(distributionData);
-          setAlerts(alertsData);
-          setSegments(segmentsData);
-          setRanking(rankingData);
-          setGrassRanking(grassRankingData);
-          if (segmentsData[0]) {
-            setSelectedSegmentId(segmentsData[0].id);
-          }
-        });
-      } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : "Failed to load operational data.");
+      try {
+        const user = await api.getCurrentUser();
+        setCurrentUser(user);
+        await refreshData();
+      } catch {
+        authSession.clear();
+        setCurrentUser(null);
       } finally {
         setLoading(false);
+        setAuthLoading(false);
       }
     }
 
-    void loadInitialData();
+    void bootstrap();
   }, []);
 
   useEffect(() => {
-    if (!selectedSegmentId) {
+    if (!selectedSegmentId || !currentUser) {
       setSelectedSegment(null);
       setLiveWeather(null);
       setGrassPrediction(null);
@@ -131,7 +114,7 @@ export default function App() {
     }
 
     void loadSegmentInsights();
-  }, [selectedSegmentId]);
+  }, [currentUser, selectedSegmentId]);
 
   async function refreshData() {
     const [
@@ -163,7 +146,51 @@ export default function App() {
       setSegments(segmentsData);
       setRanking(rankingData);
       setGrassRanking(grassRankingData);
+      if (!selectedSegmentId && segmentsData[0]) {
+        setSelectedSegmentId(segmentsData[0].id);
+      }
     });
+  }
+
+  async function handleLogin(username: string, password: string) {
+    setError(null);
+    setAuthLoading(true);
+    try {
+      const auth = await api.login(username, password);
+      authSession.setToken(auth.accessToken);
+      setCurrentUser({
+        username: auth.username,
+        fullName: auth.fullName,
+        role: auth.role,
+      });
+      await refreshData();
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Falha ao autenticar.");
+      authSession.clear();
+      setCurrentUser(null);
+    } finally {
+      setLoading(false);
+      setAuthLoading(false);
+    }
+  }
+
+  function handleLogout() {
+    authSession.clear();
+    setCurrentUser(null);
+    setDashboard(null);
+    setAssumptions(null);
+    setEfficiency(null);
+    setDistribution([]);
+    setAlerts([]);
+    setSegments([]);
+    setRanking([]);
+    setSelectedSegmentId(null);
+    setSelectedSegment(null);
+    setLiveWeather(null);
+    setGrassPrediction(null);
+    setGrassRanking([]);
+    setPlan(null);
+    setError(null);
   }
 
   async function handleRecalculate(rainfall: number, inspectorBoost: number) {
@@ -207,6 +234,18 @@ export default function App() {
     await refreshData();
   }
 
+  if (authLoading) {
+    return <div className="app-shell loading-state">Validando sessao operacional...</div>;
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="app-shell">
+        <LoginPanel error={error} onLogin={handleLogin} />
+      </div>
+    );
+  }
+
   if (loading) {
     return <div className="app-shell loading-state">Carregando centro operacional...</div>;
   }
@@ -242,9 +281,14 @@ export default function App() {
           </p>
         </div>
         <div className="hero-highlight">
+          <span className="hero-chip">{currentUser.fullName}</span>
+          <span className="hero-chip">{currentUser.role}</span>
           <span className="hero-chip">Entrada</span>
           <span className="hero-chip">Processamento</span>
           <span className="hero-chip">Saida</span>
+          <button className="button secondary" onClick={handleLogout}>
+            Sair
+          </button>
         </div>
       </header>
 

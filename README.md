@@ -39,7 +39,7 @@ Business outcomes emphasized in the board presentation:
 
 ## Tech Stack
 
-- Backend: Java 21+, Spring Boot, Spring Data JPA, Bean Validation, OpenAPI
+- Backend: Java 21+, Spring Boot, Spring Data JPA, Spring Security, JWT, Bean Validation, OpenAPI
 - Database: PostgreSQL
 - Frontend: React, TypeScript, Vite
 - Infra: Docker, Docker Compose
@@ -67,6 +67,7 @@ docker-compose.yml
 - weekly plan generation based on crew capacity
 - fixed-schedule vs intelligent-plan comparison
 - scenario simulator for rainfall and available crews
+- JWT login for operational access and protected APIs
 
 ## Business Rules
 
@@ -130,6 +131,8 @@ Core endpoints:
 - `POST /api/weather/live/refresh-all`
 - `GET /api/ml/grass-growth/{segmentId}`
 - `GET /api/ml/grass-growth/ranking`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
 
 Swagger UI:
 
@@ -205,6 +208,12 @@ Backend:
 - `SPRING_DATASOURCE_USERNAME`
 - `SPRING_DATASOURCE_PASSWORD`
 - `APP_CORS_ALLOWED_ORIGINS`
+- `APP_AUTH_DEMO_USERNAME`
+- `APP_AUTH_DEMO_PASSWORD`
+- `APP_AUTH_DEMO_FULL_NAME`
+- `APP_AUTH_DEMO_ROLE`
+- `APP_AUTH_JWT_SECRET`
+- `APP_AUTH_TOKEN_EXPIRATION_HOURS`
 - `OPENWEATHER_API_KEY`
 - `OPENWEATHER_BASE_URL`
 
@@ -225,6 +234,7 @@ Frontend checks:
 ```bash
 cd frontend
 npm install
+npm test
 npm run build
 ```
 
@@ -244,8 +254,8 @@ Recommended presentation flow for the academic board:
 
 - Initial road geometries are simulated to keep the prototype demonstrable.
 - Operational and cost premises are simulated from challenge references, not from audited Motiva production systems.
-- The weather layer is represented by internal snapshots and scenario simulation, not live meteorological integration.
-- Authentication was intentionally deferred to keep the prototype focused on the operational decision engine.
+- The weather layer supports OpenWeather snapshots when the API key is configured and falls back to simulation otherwise.
+- Authentication uses a protected demo operator profile for presentation and should evolve to a real user store for production.
 - Computer vision, IoT, and smart camera integrations are treated as future evolutions, not MVP dependencies.
 
 ## Tests Added
@@ -253,11 +263,13 @@ Recommended presentation flow for the academic board:
 - unit tests for priority scoring
 - unit tests for weekly plan generation
 - controller tests for priority ranking and plan generation
+- controller tests for auth and road segments
+- frontend component and API tests with Vitest and Testing Library
 
 ## Pending Improvements
 
 - ingest KMZ and Excel files automatically
-- add JWT authentication and role-based permissions
+- add database-backed users and role-based permissions
 - export PDF/CSV reports
 - connect with real weather APIs and GIS layers
 - persist scenario simulations for audit history

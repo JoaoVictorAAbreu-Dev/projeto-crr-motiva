@@ -1,4 +1,20 @@
 export type PriorityLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type UserRole = "MANAGER" | "ANALYST";
+
+export interface AuthenticatedUser {
+  username: string;
+  fullName: string;
+  role: UserRole | string;
+}
+
+export interface AuthToken {
+  accessToken: string;
+  tokenType: string;
+  expiresAt: string;
+  username: string;
+  fullName: string;
+  role: UserRole | string;
+}
 
 export interface SegmentSummary {
   id: string;

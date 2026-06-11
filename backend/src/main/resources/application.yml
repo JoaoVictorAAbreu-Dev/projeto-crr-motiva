@@ -20,6 +20,14 @@ spring:
 app:
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  auth:
+    demo-user:
+      username: ${APP_AUTH_DEMO_USERNAME:motiva.admin}
+      password: ${APP_AUTH_DEMO_PASSWORD:motiva@123}
+      full-name: ${APP_AUTH_DEMO_FULL_NAME:Operador Motiva}
+      role: ${APP_AUTH_DEMO_ROLE:MANAGER}
+    jwt-secret: ${APP_AUTH_JWT_SECRET:motiva-verde-inteligente-jwt-secret-2026-safe-key}
+    token-expiration-hours: ${APP_AUTH_TOKEN_EXPIRATION_HOURS:12}
   weather:
     provider: openweather
     api-key: ${OPENWEATHER_API_KEY:}

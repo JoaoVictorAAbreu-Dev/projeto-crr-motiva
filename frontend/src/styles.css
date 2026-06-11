@@ -122,7 +122,8 @@ select {
 .distribution-list,
 .alerts-list,
 .weather-grid,
-.rank-mini-list {
+.rank-mini-list,
+.login-form {
   display: grid;
   gap: 18px;
 }
@@ -332,19 +333,26 @@ select {
 }
 
 .scenario-grid label,
-.filters-grid label {
+.filters-grid label,
+.login-form label {
   display: grid;
   gap: 8px;
   color: var(--muted);
 }
 
 .scenario-grid input,
-.filters-grid select {
+.filters-grid select,
+.login-form input {
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(5, 10, 18, 0.55);
   color: var(--text);
+}
+
+.login-shell {
+  max-width: 520px;
+  margin: 8vh auto 0;
 }
 
 .toggle-row {

@@ -1,4 +1,6 @@
 import type {
+  AuthenticatedUser,
+  AuthToken,
   CriticalSegmentReportItem,
   DashboardAssumptions,
   DashboardOverview,
@@ -16,25 +18,50 @@ import type {
 } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api";
+const ACCESS_TOKEN_KEY = "motiva.accessToken";
+
+export const authSession = {
+  getToken: () => localStorage.getItem(ACCESS_TOKEN_KEY),
+  setToken: (token: string) => localStorage.setItem(ACCESS_TOKEN_KEY, token),
+  clear: () => localStorage.removeItem(ACCESS_TOKEN_KEY),
+};
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = authSession.getToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },
     ...init,
   });
 
   if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || `Request failed with status ${response.status}`);
+    if (response.status === 401) {
+      authSession.clear();
+    }
+    const rawMessage = await response.text();
+    let message = rawMessage;
+    try {
+      const parsed = JSON.parse(rawMessage) as { message?: string };
+      message = parsed.message ?? rawMessage;
+    } catch {
+      message = rawMessage;
+    }
+    throw new Error(message || (response.status === 401 ? "Sua sessao expirou. Faça login novamente." : `Request failed with status ${response.status}`));
   }
 
   return response.json() as Promise<T>;
 }
 
 export const api = {
+  login: (username: string, password: string) =>
+    apiFetch<AuthToken>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    }),
+  getCurrentUser: () => apiFetch<AuthenticatedUser>("/auth/me"),
   getDashboardAssumptions: () => apiFetch<DashboardAssumptions>("/dashboard/assumptions"),
   getDashboardOverview: () => apiFetch<DashboardOverview>("/dashboard/overview"),
   getSegments: () => apiFetch<SegmentSummary[]>("/segments"),

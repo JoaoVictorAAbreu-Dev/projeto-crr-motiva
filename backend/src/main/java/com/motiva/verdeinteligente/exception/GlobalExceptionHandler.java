@@ -3,6 +3,7 @@ package com.motiva.verdeinteligente.exception;
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -41,6 +42,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(
             new ApiErrorResponse(LocalDateTime.now(), 400, "VALIDATION_ERROR", "Constraint validation failed", details)
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+            new ApiErrorResponse(LocalDateTime.now(), 401, "UNAUTHORIZED", ex.getMessage(), List.of())
         );
     }
 }
