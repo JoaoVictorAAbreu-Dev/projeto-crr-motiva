@@ -1,4 +1,6 @@
 import { startTransition, useDeferredValue, useEffect, useState } from "react";
+import { AssumptionsPanel } from "./components/AssumptionsPanel";
+import { FilterToolbar } from "./components/FilterToolbar";
 import { OperationalMap } from "./components/OperationalMap";
 import { RankingTable } from "./components/RankingTable";
 import { ScenarioPanel } from "./components/ScenarioPanel";
@@ -7,9 +9,11 @@ import { StatCard } from "./components/StatCard";
 import { WeeklyPlanPanel } from "./components/WeeklyPlanPanel";
 import { api } from "./services/api";
 import type {
+  DashboardAssumptions,
   DashboardOverview,
   EfficiencySummary,
   PriorityAssessment,
+  PriorityLevel,
   SegmentDetail,
   SegmentSummary,
   WeeklyPlan,
@@ -23,6 +27,7 @@ const currency = new Intl.NumberFormat("pt-BR", {
 
 export default function App() {
   const [dashboard, setDashboard] = useState<DashboardOverview | null>(null);
+  const [assumptions, setAssumptions] = useState<DashboardAssumptions | null>(null);
   const [efficiency, setEfficiency] = useState<EfficiencySummary | null>(null);
   const [segments, setSegments] = useState<SegmentSummary[]>([]);
   const deferredSegments = useDeferredValue(segments);
@@ -30,14 +35,19 @@ export default function App() {
   const [selectedSegmentId, setSelectedSegmentId] = useState<string | null>(null);
   const [selectedSegment, setSelectedSegment] = useState<SegmentDetail | null>(null);
   const [plan, setPlan] = useState<WeeklyPlan | null>(null);
+  const [selectedHighway, setSelectedHighway] = useState("ALL");
+  const [selectedPriority, setSelectedPriority] = useState<PriorityLevel | "ALL">("ALL");
+  const [contractOnly, setContractOnly] = useState(false);
+  const [sensitiveOnly, setSensitiveOnly] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadInitialData() {
       try {
-        const [dashboardData, efficiencyData, segmentsData, rankingData] = await Promise.all([
+        const [dashboardData, assumptionsData, efficiencyData, segmentsData, rankingData] = await Promise.all([
           api.getDashboardOverview(),
+          api.getDashboardAssumptions(),
           api.getEfficiencySummary(),
           api.getSegments(),
           api.getRanking(),
@@ -45,6 +55,7 @@ export default function App() {
 
         startTransition(() => {
           setDashboard(dashboardData);
+          setAssumptions(assumptionsData);
           setEfficiency(efficiencyData);
           setSegments(segmentsData);
           setRanking(rankingData);
@@ -76,8 +87,9 @@ export default function App() {
   }, [selectedSegmentId]);
 
   async function refreshData() {
-    const [dashboardData, efficiencyData, segmentsData, rankingData] = await Promise.all([
+    const [dashboardData, assumptionsData, efficiencyData, segmentsData, rankingData] = await Promise.all([
       api.getDashboardOverview(),
+      api.getDashboardAssumptions(),
       api.getEfficiencySummary(),
       api.getSegments(),
       api.getRanking(),
@@ -85,6 +97,7 @@ export default function App() {
 
     startTransition(() => {
       setDashboard(dashboardData);
+      setAssumptions(assumptionsData);
       setEfficiency(efficiencyData);
       setSegments(segmentsData);
       setRanking(rankingData);
@@ -110,6 +123,25 @@ export default function App() {
   if (loading) {
     return <div className="app-shell loading-state">Carregando centro operacional...</div>;
   }
+
+  const highways = Array.from(new Set(segments.map((segment) => segment.highway))).sort();
+  const filteredSegments = deferredSegments.filter((segment) => {
+    if (selectedHighway !== "ALL" && segment.highway !== selectedHighway) {
+      return false;
+    }
+    if (selectedPriority !== "ALL" && segment.priorityLevel !== selectedPriority) {
+      return false;
+    }
+    if (contractOnly && !segment.contractualPressure) {
+      return false;
+    }
+    if (sensitiveOnly && !segment.sensitiveArea) {
+      return false;
+    }
+    return true;
+  });
+  const filteredIds = new Set(filteredSegments.map((segment) => segment.id));
+  const filteredRanking = ranking.filter((item) => filteredIds.has(item.segmentId));
 
   return (
     <div className="app-shell">
@@ -138,20 +170,36 @@ export default function App() {
         <StatCard label="Economia estimada" value={currency.format(efficiency?.estimatedSavings ?? 0)} hint="comparacao com cronograma fixo" />
       </section>
 
+      <section className="stats-grid compact-grid">
+        <StatCard label="Risco contratual" value={`${dashboard?.segmentsAtContractRisk ?? 0}`} hint="trechos com obrigacao contratual sensivel" />
+        <StatCard label="Areas sensiveis" value={`${dashboard?.segmentsInSensitiveAreas ?? 0}`} hint="locais com visibilidade e infraestrutura sensivel" />
+        <StatCard label="Ciclos evitados" value={`${efficiency?.projectedAnnualCyclesAvoided ?? 0}`} hint="projecao anual de ciclos evitados" />
+        <StatCard label="Uso sugerido" value={`${dashboard?.recommendedCrewUtilization ?? 0}%`} hint="aproveitamento recomendado da capacidade das equipes" />
+      </section>
+
+      <FilterToolbar
+        highways={highways}
+        selectedHighway={selectedHighway}
+        selectedPriority={selectedPriority}
+        contractOnly={contractOnly}
+        sensitiveOnly={sensitiveOnly}
+        onHighwayChange={setSelectedHighway}
+        onPriorityChange={setSelectedPriority}
+        onContractOnlyChange={setContractOnly}
+        onSensitiveOnlyChange={setSensitiveOnly}
+      />
+
       <main className="main-grid">
         <div className="left-column">
-          <OperationalMap
-            segments={deferredSegments}
-            selectedId={selectedSegmentId}
-            onSelect={setSelectedSegmentId}
-          />
+          <OperationalMap segments={filteredSegments} selectedId={selectedSegmentId} onSelect={setSelectedSegmentId} />
           <ScenarioPanel onRecalculate={handleRecalculate} onGeneratePlan={handleGeneratePlan} />
-          <RankingTable ranking={ranking} />
+          <RankingTable ranking={filteredRanking} onSelect={setSelectedSegmentId} />
         </div>
 
         <div className="right-column">
           <SegmentInspector segment={selectedSegment} />
           <WeeklyPlanPanel plan={plan} />
+          <AssumptionsPanel assumptions={assumptions} />
           <section className="panel report-panel">
             <div className="panel-header">
               <div>
@@ -172,6 +220,10 @@ export default function App() {
                 <strong>{dashboard?.availableTeams ?? 0}</strong>
                 <span>Equipes disponiveis para a semana</span>
               </article>
+            </div>
+            <div className="focus-strip">
+              <span>{dashboard?.currentScenarioLabel}</span>
+              <span>{efficiency?.operationalFocus}</span>
             </div>
             <p className="report-copy">{efficiency?.summary}</p>
           </section>

@@ -11,6 +11,8 @@ export interface SegmentSummary {
   operationalCriticality: string;
   lastMowingDate: string;
   historicalFrequencyDays: number;
+  sensitiveArea: boolean;
+  contractualPressure: boolean;
   mapX: number;
   mapY: number;
   score: number;
@@ -57,15 +59,21 @@ export interface CriticalSegmentReportItem {
   highway: string;
   score: number;
   priorityLevel: PriorityLevel;
+  sensitiveArea: boolean;
+  contractualPressure: boolean;
+  actionBias: string;
   reasons: string;
 }
 
 export interface EfficiencySummary {
   criticalSegments: number;
   highPrioritySegments: number;
+  mediumPrioritySegments: number;
   estimatedWeeklyCostFixedSchedule: number;
   estimatedWeeklyCostSmartPlan: number;
   estimatedSavings: number;
+  projectedAnnualCyclesAvoided: number;
+  operationalFocus: string;
   summary: string;
 }
 
@@ -74,9 +82,22 @@ export interface DashboardOverview {
   criticalSegments: number;
   highPrioritySegments: number;
   availableTeams: number;
+  segmentsAtContractRisk: number;
+  segmentsInSensitiveAreas: number;
   averageScore: number;
   estimatedSavings: number;
+  recommendedCrewUtilization: number;
+  currentScenarioLabel: string;
   topCriticalSegments: CriticalSegmentReportItem[];
+}
+
+export interface DashboardAssumptions {
+  dataPolicy: string;
+  decisionPolicy: string;
+  safetyPolicy: string;
+  privacyPolicy: string;
+  costReferences: string[];
+  operationalReferences: string[];
 }
 
 export interface WeeklyPlanItem {

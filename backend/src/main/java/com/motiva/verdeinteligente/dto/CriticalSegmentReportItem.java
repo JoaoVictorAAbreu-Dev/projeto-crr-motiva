@@ -7,6 +7,9 @@ public record CriticalSegmentReportItem(
     String highway,
     double score,
     PriorityLevel priorityLevel,
+    boolean sensitiveArea,
+    boolean contractualPressure,
+    String actionBias,
     String reasons
 ) {
 }

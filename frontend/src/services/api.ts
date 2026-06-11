@@ -1,5 +1,6 @@
 import type {
   CriticalSegmentReportItem,
+  DashboardAssumptions,
   DashboardOverview,
   EfficiencySummary,
   PriorityAssessment,
@@ -28,6 +29,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  getDashboardAssumptions: () => apiFetch<DashboardAssumptions>("/dashboard/assumptions"),
   getDashboardOverview: () => apiFetch<DashboardOverview>("/dashboard/overview"),
   getSegments: () => apiFetch<SegmentSummary[]>("/segments"),
   getSegmentDetail: (id: string) => apiFetch<SegmentDetail>(`/segments/${id}`),

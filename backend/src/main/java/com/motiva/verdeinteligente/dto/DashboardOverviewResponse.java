@@ -7,8 +7,12 @@ public record DashboardOverviewResponse(
     int criticalSegments,
     int highPrioritySegments,
     int availableTeams,
+    int segmentsAtContractRisk,
+    int segmentsInSensitiveAreas,
     double averageScore,
     double estimatedSavings,
+    int recommendedCrewUtilization,
+    String currentScenarioLabel,
     List<CriticalSegmentReportItem> topCriticalSegments
 ) {
 }

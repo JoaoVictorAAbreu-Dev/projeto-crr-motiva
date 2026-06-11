@@ -1,5 +1,6 @@
 package com.motiva.verdeinteligente.controller;
 
+import com.motiva.verdeinteligente.dto.DashboardAssumptionsResponse;
 import com.motiva.verdeinteligente.dto.DashboardOverviewResponse;
 import com.motiva.verdeinteligente.service.ReportingService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,5 +20,10 @@ public class DashboardController {
     @GetMapping("/overview")
     public DashboardOverviewResponse overview() {
         return reportingService.dashboardOverview();
+    }
+
+    @GetMapping("/assumptions")
+    public DashboardAssumptionsResponse assumptions() {
+        return reportingService.dashboardAssumptions();
     }
 }

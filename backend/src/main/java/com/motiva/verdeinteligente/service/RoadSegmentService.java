@@ -83,6 +83,8 @@ public class RoadSegmentService {
             segment.getOperationalCriticality(),
             segment.getLastMowingDate(),
             segment.getHistoricalFrequencyDays(),
+            segment.isSensitiveArea(),
+            segment.isContractualPressure(),
             segment.getMapX(),
             segment.getMapY(),
             assessment.getScore(),

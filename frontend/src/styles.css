@@ -30,7 +30,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -110,7 +111,10 @@ input {
 .stats-grid,
 .main-grid,
 .scenario-grid,
-.report-grid {
+.report-grid,
+.filters-grid,
+.assumptions-grid,
+.assumptions-list-grid {
   display: grid;
   gap: 18px;
 }
@@ -118,6 +122,10 @@ input {
 .stats-grid {
   margin-top: 24px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.compact-grid {
+  margin-top: 18px;
 }
 
 .main-grid {
@@ -196,7 +204,8 @@ input {
 .map-legend,
 .plan-summary,
 .inspector-metrics,
-.scenario-actions {
+.scenario-actions,
+.focus-strip {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
@@ -204,7 +213,8 @@ input {
 
 .map-legend span,
 .plan-summary span,
-.inspector-metrics span {
+.inspector-metrics span,
+.focus-strip span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -221,13 +231,32 @@ input {
   display: inline-block;
 }
 
-.critical { background: var(--danger); }
-.high { background: var(--accent-warm); }
-.medium { background: var(--accent); }
-.low { background: var(--low); }
+.critical {
+  background: var(--danger);
+}
+
+.high {
+  background: var(--accent-warm);
+}
+
+.medium {
+  background: var(--accent);
+}
+
+.low {
+  background: var(--low);
+}
 
 .table-shell {
   overflow-x: auto;
+}
+
+.table-row-clickable {
+  cursor: pointer;
+}
+
+.table-row-clickable:hover td {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .ranking-table {
@@ -274,22 +303,32 @@ input {
   color: #b8c8ff;
 }
 
-.scenario-grid {
+.scenario-grid,
+.filters-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.scenario-grid label {
+.scenario-grid label,
+.filters-grid label {
   display: grid;
   gap: 8px;
   color: var(--muted);
 }
 
-.scenario-grid input {
+.scenario-grid input,
+.filters-grid select {
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(5, 10, 18, 0.55);
   color: var(--text);
+}
+
+.toggle-row {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding-top: 34px;
 }
 
 .button {
@@ -351,12 +390,15 @@ input {
   margin-top: 6px;
 }
 
-.report-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 10px;
+.report-grid,
+.assumptions-grid,
+.assumptions-list-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.report-grid article {
+.report-grid article,
+.assumptions-grid article,
+.assumptions-list-grid > div {
   padding: 18px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.03);
@@ -373,7 +415,10 @@ input {
   .stats-grid,
   .main-grid,
   .scenario-grid,
-  .report-grid {
+  .report-grid,
+  .filters-grid,
+  .assumptions-grid,
+  .assumptions-list-grid {
     grid-template-columns: 1fr;
   }
 

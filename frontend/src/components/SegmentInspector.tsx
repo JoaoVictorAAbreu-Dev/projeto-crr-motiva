@@ -15,18 +15,25 @@ export function SegmentInspector({ segment }: SegmentInspectorProps) {
       </div>
 
       {!segment ? (
-        <p className="empty-state">Selecione um trecho no mapa para ver score, explicabilidade e contexto climático.</p>
+        <p className="empty-state">Selecione um trecho no mapa para ver score, explicabilidade e contexto climatico.</p>
       ) : (
         <div className="inspector-content">
           <div>
             <h3>{segment.name}</h3>
-            <p>{segment.highway} • km {segment.kmStart.toFixed(1)} a {segment.kmEnd.toFixed(1)}</p>
+            <p>
+              {segment.highway} • km {segment.kmStart.toFixed(1)} a {segment.kmEnd.toFixed(1)}
+            </p>
           </div>
           <div className="inspector-metrics">
             <span>IPI {segment.score.toFixed(1)}</span>
             <span>{segment.priorityLevel}</span>
             <span>{segment.recentRainfallMm} mm</span>
             <span>{segment.humidityPercent}% umidade</span>
+          </div>
+          <div className="inspector-metrics">
+            <span>{segment.contractualPressure ? "Com pressao contratual" : "Sem pressao contratual"}</span>
+            <span>{segment.sensitiveArea ? "Area sensivel" : "Area padrao"}</span>
+            <span>Sinal do fiscal {segment.inspectorSignal}</span>
           </div>
           <ul className="reason-list">
             {segment.reasons.map((reason) => (

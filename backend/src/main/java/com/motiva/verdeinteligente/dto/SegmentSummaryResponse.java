@@ -17,6 +17,8 @@ public record SegmentSummaryResponse(
     OperationalCriticality operationalCriticality,
     LocalDate lastMowingDate,
     int historicalFrequencyDays,
+    boolean sensitiveArea,
+    boolean contractualPressure,
     double mapX,
     double mapY,
     double score,
