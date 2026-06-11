@@ -1,85 +1,158 @@
 # GreenOps Control Center
 
-GreenOps Control Center is a portfolio-grade decision support platform for highway vegetation operations. It demonstrates how to combine operational rules, weather context, explainable prioritization, weekly crew planning, and secure API delivery in a single full-stack product.
+Plataforma web de apoio à decisão para gestão operacional de vegetação em rodovias.
 
-The project is positioned as an operational intelligence product rather than a dashboard-only prototype. It focuses on a clear flow of `input -> processing -> operational output`:
+O GreenOps Control Center foi desenvolvido como projeto de portfólio para demonstrar capacidade de entrega full stack em um cenário realista de operação: ingestão de dados, priorização explicável, planejamento semanal, integração com clima, autenticação JWT, testes automatizados e documentação técnica.
 
-- segment and maintenance data enter the system
-- the prioritization engine scores intervention urgency
-- planners receive an explainable ranking, map view, weather context, and weekly execution plan
+## Visão Geral
 
-## Product Overview
+Em operações lineares de manutenção, como conservação de faixa de domínio, o maior problema não costuma ser falta de execução, mas sim falta de priorização. Cronogramas fixos tendem a gerar dois desperdícios ao mesmo tempo:
 
-GreenOps Control Center helps maintenance teams answer three core questions:
+- intervenção antes da hora, elevando custo operacional
+- intervenção tarde demais, aumentando risco de visibilidade, recorrência e pressão contratual
 
-- where should the next intervention happen first
-- when should the intervention happen
-- how should the available crews be allocated across the week
+O GreenOps Control Center resolve esse problema organizando a operação em um fluxo claro:
 
-Main outputs:
+1. entrada de dados operacionais e climáticos
+2. cálculo de prioridade por trecho com lógica explicável
+3. visualização em mapa, ranking e indicadores executivos
+4. geração de plano semanal conforme capacidade das equipes
 
-- operational dashboard with executive metrics
-- explainable intervention priority index per segment
-- criticality map with segment inspection
-- weather snapshot and grass-growth projection
-- weekly crew plan generation
-- efficiency summary against fixed scheduling
-- protected API with JWT authentication
+## Objetivo do Produto
 
-## Why This Project Works as Portfolio
+O sistema responde três perguntas operacionais centrais:
 
-This repository demonstrates end-to-end engineering work across:
+- onde intervir primeiro
+- quando intervir
+- como distribuir as equipes disponíveis
 
-- backend architecture with Spring Boot, validation, security, and API design
-- frontend application structure with React, TypeScript, component decomposition, and API integration
-- explainable business logic for prioritization and planning
-- automated tests in backend controllers and frontend components/services
-- environment-based configuration and local startup scripts
-- OpenAPI documentation and Dockerized setup
+Em vez de funcionar como um CRUD genérico, o produto foi desenhado como um centro de controle operacional, com foco em decisão, rastreabilidade e produtividade.
 
-## Tech Stack
+## Principais Funcionalidades
 
-- Backend: Java 21+, Spring Boot, Spring Data JPA, Spring Security, JWT, Bean Validation, OpenAPI
-- Database: PostgreSQL
-- Frontend: React, TypeScript, Vite
-- Infra: Docker, Docker Compose
-- Tests: JUnit 5, Mockito, Spring MVC Test, Vitest, Testing Library
+- cadastro e consulta de trechos rodoviários com atributos operacionais
+- cálculo do Índice de Prioridade de Intervenção (IPI)
+- ranking explicável de criticidade
+- mapa operacional com inspeção por trecho
+- painel executivo com backlog, risco e economia estimada
+- geração de plano semanal com limite de equipes
+- comparação entre cronograma fixo e priorização inteligente
+- integração com OpenWeather com fallback para simulação
+- estimativa de altura da grama com modelo preditivo leve
+- autenticação JWT para acesso às APIs operacionais
 
-## Core Features
+## Diferenciais Técnicos
 
-- road segment catalog with operational metadata
-- transparent intervention priority index recalculation
-- explainable priority ranking
-- operational map with clickable segments
-- weather snapshot refresh and fallback simulation
-- grass-height prediction with simple ML-based estimation
-- weekly plan generation based on crew capacity
-- fixed-schedule versus intelligent-plan comparison
-- JWT login for operational access and protected APIs
+- regra de negócio centralizada em serviços do backend
+- modelo de priorização explicável, sem dependência de IA caixa-preta
+- frontend organizado por componentes e camada de serviços
+- autenticação stateless com Spring Security + JWT
+- documentação OpenAPI com suporte a Bearer Token
+- suíte mínima de testes automatizados no frontend e backend
+- scripts locais para acelerar setup e demonstração
 
-## Decision Model
+## Arquitetura
 
-The intervention priority index ranges from `0` to `100` and considers:
+### Backend
 
-- days since last mowing
-- recent rainfall
-- temperature and humidity
-- vegetation growth profile
-- operational criticality
-- recurrence of prior interventions
-- sensitive-area pressure
-- contractual pressure
-- field inspector signal
-- predicted grass height and time-to-critical threshold
+Stack principal:
 
-The model is intentionally explainable. Every score returns a reason list so the recommendation can be defended operationally.
+- Java 21
+- Spring Boot
+- Spring Data JPA
+- Spring Security
+- JWT
+- Bean Validation
+- OpenAPI / Swagger
 
-## API Summary
+Organização em camadas:
 
-Core endpoints:
+- `controller`: exposição de endpoints REST
+- `dto`: contratos de entrada e saída
+- `service`: regra de negócio e orquestração
+- `repository`: acesso a dados
+- `model`: entidades de domínio
+- `config`: infraestrutura, OpenAPI, CORS e segurança
+- `exception`: tratamento centralizado de erros
+
+### Frontend
+
+Stack principal:
+
+- React
+- TypeScript
+- Vite
+
+Padrões adotados:
+
+- componentes reutilizáveis
+- separação entre UI e consumo de API
+- estado de tela concentrado no `App.tsx`
+- autenticação persistida em sessão local
+- testes com Vitest e Testing Library
+
+### Banco de Dados
+
+- PostgreSQL
+
+O projeto usa PostgreSQL como banco principal e H2 para cenários de teste no backend.
+
+## Modelo de Decisão
+
+O Índice de Prioridade de Intervenção varia de `0` a `100` e considera:
+
+- dias desde a última roçada
+- chuva recente
+- temperatura e umidade
+- classe de vegetação
+- criticidade operacional
+- recorrência histórica
+- pressão contratual
+- sensibilidade do trecho
+- sinalização manual do fiscal
+- altura prevista da vegetação
+- tempo estimado até atingir faixa crítica
+
+O sistema sempre retorna justificativas textuais para o score calculado, permitindo defender a decisão de forma objetiva.
+
+## Camada de ML
+
+O projeto inclui um modelo preditivo leve para estimativa de crescimento da grama.
+
+Características:
+
+- abordagem simples e explicável
+- treinamento sintético com regressão aproximada
+- previsão de altura estimada
+- crescimento diário esperado
+- dias até altura crítica
+- drivers textuais da previsão
+
+Essa camada complementa a priorização. A decisão principal continua baseada em lógica operacional transparente.
+
+## Segurança
+
+O acesso às APIs operacionais é protegido com JWT.
+
+Fluxo implementado:
+
+1. autenticação via `POST /api/auth/login`
+2. emissão de token Bearer
+3. armazenamento local da sessão no frontend
+4. envio automático do token nas chamadas autenticadas
+5. endpoint `GET /api/auth/me` para resolução da sessão corrente
+
+O Swagger foi configurado com esquema Bearer para facilitar inspeção e demonstração técnica da API.
+
+## Endpoints Principais
+
+### Autenticação
 
 - `POST /api/auth/login`
 - `GET /api/auth/me`
+
+### Operação
+
 - `GET /api/segments`
 - `GET /api/segments/{id}`
 - `GET /api/priority-ranking`
@@ -87,23 +160,31 @@ Core endpoints:
 - `POST /api/maintenance-events`
 - `POST /api/weekly-plans/generate`
 - `GET /api/weekly-plans/{id}`
+
+### Relatórios e Dashboard
+
 - `GET /api/reports/critical-segments`
 - `GET /api/reports/efficiency-summary`
 - `GET /api/reports/priority-distribution`
 - `GET /api/reports/operational-alerts`
 - `GET /api/dashboard/overview`
 - `GET /api/dashboard/assumptions`
+
+### Clima e Previsão
+
 - `GET /api/weather/live/{segmentId}`
 - `POST /api/weather/live/{segmentId}/refresh`
 - `POST /api/weather/live/refresh-all`
 - `GET /api/ml/grass-growth/{segmentId}`
 - `GET /api/ml/grass-growth/ranking`
 
+## Documentação da API
+
 Swagger UI:
 
 - `http://localhost:8080/swagger-ui.html`
 
-## Project Structure
+## Estrutura do Projeto
 
 ```text
 backend/
@@ -114,11 +195,16 @@ frontend/
   src/
 docker-compose.yml
 .env.example
+check-local.cmd
+start-local.cmd
+start-frontend.cmd
 ```
 
-## Setup
+## Setup Rápido
 
-Quick Windows shortcuts from the project root:
+### Scripts locais
+
+Na raiz do projeto:
 
 ```bat
 check-local.cmd
@@ -126,56 +212,50 @@ start-local.cmd
 start-frontend.cmd
 ```
 
-What each script does:
+Função de cada script:
 
-- `check-local.cmd`: verifies `.env`, Java, Maven, Docker, and npm
-- `start-local.cmd`: prefers `docker compose up --build`; if Docker is missing, it starts the frontend and tells you how to run the backend
-- `start-frontend.cmd`: installs dependencies and starts the React app directly
+- `check-local.cmd`: valida ambiente, dependências e variáveis
+- `start-local.cmd`: sobe a stack preferencialmente com Docker Compose
+- `start-frontend.cmd`: inicia o frontend separadamente
 
-### Option 1: Docker Compose
+## Execução com Docker
 
-Requirements:
+Pré-requisito:
 
 - Docker Desktop
 
-Steps:
+Passos:
 
-1. Copy `.env.example` to `.env`.
-2. Run:
+1. copie `.env.example` para `.env`
+2. execute:
 
 ```bash
 docker compose up --build
 ```
 
-Frontend:
+Acessos:
 
-- `http://localhost:5173`
+- frontend: `http://localhost:5173`
+- backend: `http://localhost:8080`
+- PostgreSQL: `localhost:5432`
 
-Backend:
+## Execução Local
 
-- `http://localhost:8080`
-
-PostgreSQL:
-
-- `localhost:5432`
-
-### Option 2: Local Development
-
-Requirements:
+Pré-requisitos:
 
 - Java 21+
 - Maven 3.9+
 - Node 22+
 - PostgreSQL 16+
 
-Backend:
+### Backend
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-Frontend:
+### Frontend
 
 ```bash
 cd frontend
@@ -183,11 +263,11 @@ npm install
 npm run dev
 ```
 
-## Environment Variables
+## Variáveis de Ambiente
 
-Use `.env.example` as the base configuration.
+Use `.env.example` como base.
 
-Backend:
+### Backend
 
 - `SPRING_DATASOURCE_URL`
 - `SPRING_DATASOURCE_USERNAME`
@@ -202,20 +282,29 @@ Backend:
 - `OPENWEATHER_API_KEY`
 - `OPENWEATHER_BASE_URL`
 
-Frontend:
+### Frontend
 
 - `VITE_API_BASE_URL`
 
-## Testing
+## Credenciais de Demonstração
 
-Backend tests:
+Credencial padrão:
+
+- usuário: `motiva.admin`
+- senha: `motiva@123`
+
+Esses valores podem ser alterados via `.env`.
+
+## Testes
+
+### Backend
 
 ```bash
 cd backend
 mvn test
 ```
 
-Frontend checks:
+### Frontend
 
 ```bash
 cd frontend
@@ -224,36 +313,38 @@ npm test
 npm run build
 ```
 
-## Demo Credentials
+## Cobertura de Testes Implementada
 
-Default demo operator:
+- testes unitários do motor de priorização
+- testes unitários do plano semanal
+- testes de controller para autenticação, segmentos, ranking, relatórios e geração de plano
+- testes de componentes do frontend
+- testes da camada de API do frontend
 
-- username: `motiva.admin`
-- password: `motiva@123`
+## Limitações Atuais
 
-These credentials are environment-driven and can be changed through `.env`.
-
-## Automated Tests Included
-
-- unit tests for priority scoring
-- unit tests for weekly plan generation
-- controller tests for auth, road segments, priority ranking, reports, and weekly plan generation
-- frontend component tests for login, weather, and grass-growth panels
-- frontend service tests for API request and error handling
-
-## Risks and Limitations
-
-- initial road geometries are simulated to keep the product demonstrable
-- operational and cost premises are representative, not audited production values
-- the weather layer uses OpenWeather when configured and falls back to simulation otherwise
-- authentication currently uses a protected demo operator instead of a persistent user table
-- computer vision, IoT, and external GIS integrations are treated as future expansions
+- geometrias e parte dos dados são simulados para manter o projeto reproduzível
+- autenticação usa usuário demonstrativo, não tabela persistida de usuários
+- integrações GIS, IoT e visão computacional ainda não fazem parte do MVP
+- a camada de ML é propositalmente simples e explicável
 
 ## Roadmap
 
-- add database-backed users and role-based permissions
-- ingest KMZ and spreadsheet sources automatically
-- export PDF and CSV operational reports
-- connect with richer GIS and weather providers
-- persist scenario simulations for audit history
-- add observability, monitoring, and deployment workflows
+- persistência real de usuários e papéis
+- RBAC mais granular por perfil operacional
+- ingestão automática de arquivos KMZ e planilhas
+- exportação PDF e CSV
+- integrações GIS e clima mais completas
+- observabilidade, métricas e pipeline CI/CD
+
+## Valor de Portfólio
+
+Este projeto demonstra:
+
+- modelagem de problema operacional real
+- arquitetura backend em camadas
+- frontend orientado a produto
+- autenticação e segurança de API
+- documentação técnica clara
+- testes automatizados
+- preocupação com setup, manutenção e entrega
